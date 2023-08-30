@@ -1,4 +1,4 @@
-import { Outlet, useLoaderData, Link} from 'react-router-dom';
+import { useLoaderData, Link} from 'react-router-dom';
 
 function Admin() {
     const data = useLoaderData();

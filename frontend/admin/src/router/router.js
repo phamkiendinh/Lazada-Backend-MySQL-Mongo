@@ -21,10 +21,17 @@ import CreateSubCategory, { loadTopCategoryField } from "../components/AdminCate
 
 //Ware House
 import WareHouse from "../components/AdminWareHouse/WareHouse";
+import { loadAllWareHouse } from "../components/AdminWareHouse/WareHouse";
+import UpdateWareHouse from "../components/AdminWareHouse/UpdateWareHouse";
+import ViewProducts from "../components/AdminWareHouse/ViewProducts";
+import CreateWareHouse from "../components/AdminWareHouse/CreateWareHouse";
+import { saveWareHouse } from "../components/AdminWareHouse/CreateWareHouse";
+import { loadProducts } from "../components/AdminWareHouse/ViewProducts";
+import { loadWareHouse } from "../components/AdminWareHouse/UpdateWareHouse";
 
 //Action Function
-import UpdateTopCategory, { updateTopCategory } from "../components/AdminCategory/UpdateTopCategory";
-import UpdateSubCategory, {loadSubCategory, updateSubCategory} from "../components/AdminCategory/UpdateSubCategory";
+import UpdateTopCategory from "../components/AdminCategory/UpdateTopCategory";
+import UpdateSubCategory, {loadSubCategory} from "../components/AdminCategory/UpdateSubCategory";
 export const routes = createBrowserRouter([
     {
         path : '/admin',
@@ -32,6 +39,7 @@ export const routes = createBrowserRouter([
         loader : loadAdmin,
         error : <Error />
     },
+    //Category Management
     {
         path : '/admin/category',
         element : <TopCategory />,
@@ -46,7 +54,6 @@ export const routes = createBrowserRouter([
     {
         path : '/admin/category/:categoryName/update',
         element : <UpdateTopCategory />,
-        action : updateTopCategory,
         loader : loadTopCategory,
         error : <Error />
     },
@@ -70,7 +77,6 @@ export const routes = createBrowserRouter([
     {
         path : '/admin/category/:categoryName/:subCategoryName/update',
         element : <UpdateSubCategory />,
-        action: updateSubCategory,
         loader: loadSubCategory,
         error : <Error />
     },
@@ -79,9 +85,29 @@ export const routes = createBrowserRouter([
         element : <SubCategoryDetail />,
         error : <Error />
     },
+    // Ware House
     {
         path : '/admin/warehouse',
         element : <WareHouse />,
+        loader: loadAllWareHouse,
+        error : <Error />
+    },
+    {
+        path : '/admin/warehouse/create',
+        element : <CreateWareHouse />,
+        action: saveWareHouse,
+        error : <Error />
+    },
+    {
+        path : '/admin/warehouse/:warehouseID/update',
+        element : <UpdateWareHouse />,
+        loader: loadWareHouse,
+        error : <Error />
+    },
+    {
+        path : '/admin/warehouse/:warehouseID/products',
+        element : <ViewProducts />,
+        loader: loadProducts,
         error : <Error />
     }
 ]);

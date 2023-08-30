@@ -86,8 +86,8 @@ function SubCategory() {
                     <button className='btn btn-primary mx-1 mt-2'>
                         <Link to={`${name}/detail`} className='text text-white' state={category}>Details</Link>
                     </button>
-                    <button className='btn btn-primary mx-1 mt-2' onClick={() => updateSubCategory(`${category['name']}`)}>Update</button>
-                    <button className='btn btn-danger mx-1 mt-2' onClick={() => deleteSubCategory(`${category['name']}`)}>Delete</button>
+                    <button className='btn btn-primary mx-1 mt-2' onClick={() => updateSubCategory(name)}>Update</button>
+                    <button className='btn btn-danger mx-1 mt-2' onClick={() => deleteSubCategory(name)}>Delete</button>
                 </div>
             </div>
             );

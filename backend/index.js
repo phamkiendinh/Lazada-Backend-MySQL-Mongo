@@ -16,7 +16,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 
 app.use('/admin', admin_router);
-app.use('/warehouse', warehouse_router);
+app.use('/admin/warehouse', warehouse_router);
 
 
 app.listen(port, () => {
