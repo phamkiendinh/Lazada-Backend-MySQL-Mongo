@@ -1,4 +1,4 @@
-CREATE DATABASE lazada;
+-- CREATE DATABASE lazada;
 USE lazada;
 
 -- Recreate tables
@@ -37,10 +37,23 @@ CREATE TABLE product (
     width DECIMAL(8,2),
     height DECIMAL(8,2),
     image VARCHAR(255),
-    wid INT NOT NULL,
-    uid INT NOT NULL,
+    wid INT,
     PRIMARY KEY(id),
     FOREIGN KEY (wid) REFERENCES warehouse(id)
+);
+
+CREATE TABLE product_template(
+	id INT auto_increment,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    price DECIMAL(10,2) NOT NULL,
+    category VARCHAR(100),
+    length DECIMAL(8,2),
+    width DECIMAL(8,2),
+    height DECIMAL(8,2),
+    image VARCHAR(255),
+    wid INT,
+    PRIMARY KEY(id)
 );
 
 -- Indexing
@@ -119,6 +132,40 @@ BEGIN
 END $$
 DELIMITER ;
 
+
+-- DELIMITER $$
+-- CREATE PROCEDURE `insert_product`(IN product_id INT, IN product_volume INT)
+-- BEGIN
+-- 	DECLARE `remaining_warehouse_volume` INT;
+--     DECLARE `warehouseID` INT;
+--     DECLARE `inserted` BOOL DEFAULT 0;
+-- 	SELECT warehouse.id INTO `warehouseID`
+--     From warehouse
+--     ORDER BY (volume - current_volume) DESC LIMIT 1;
+
+--     SELECT (volume - current_volume) INTO `remaining_warehouse_volume`
+--     FROM warehouse
+--     WHERE warehouse.id  = `warehouseID`;
+--     
+--     IF product_volume < `remaining_warehouse_volume` THEN
+-- 		
+-- -- 	ELSE
+-- 		SET `inserted` = 1;
+--     END IF;
+--     
+--     SELECT `warehouseID`, `remaining_warehouse_volume`;
+-- END $$
+-- DELIMITER ;
+
+-- INSERT INTO product
+-- SELECT title, description, price, category, length, width, height, image, wid
+-- FROM product
+-- WHERE product.id = 1;
+
+-- CALL insert_product(1, 750);
+-- DROP PROCEDURE insert_product;
+-- drop procedure move_product; 
+
 -- Sample Datas
 INSERT INTO warehouse_address (province, city, district, street, street_number) values ('Khanh Hoa', 'Nha Trang', 'Vinh Tho', 'Hai Ba Trung', '123');
 INSERT INTO warehouse_address (province, city, district, street, street_number) values ('Sai Gon', 'Ho Chi Minh', 'Quan 1', 'Ly Thai To', '245');
@@ -131,8 +178,8 @@ INSERT INTO warehouse (address_id, warehouse_name, volume, current_volume) value
 -- Test, need delete later
 INSERT INTO warehouse (address_id, warehouse_name, volume, current_volume) values (3, "Da Nang Poor Market", 5000, 3000);
 
-INSERT INTO product (title, description, price, category, length, width, height, image, wid, uid)
-VALUES ('title 1', 'This is title 1', 10, 'electronic', 5, 10, 15, 'Image 1', 1, 0),
-	   ('title 2', 'This is title 2', 20, 'mobilephone', 5, 5, 10, 'Image 2', 2, 0),
-       ('title 3', 'This is title 3', 30, 'television', 5, 10, 10, 'Image 3', 3, 0),
-	   ('title 4', 'This is title 4', 40, 'Shoes', 5, 10, 10, 'Image 4', 1, 0);
+INSERT INTO product (title, description, price, category, length, width, height, image, wid)
+VALUES ('title 1', 'This is title 1', 10, 'electronic', 5, 10, 15, 'Image 1', 1),
+	   ('title 2', 'This is title 2', 20, 'mobilephone', 5, 5, 10, 'Image 2', 2),
+       ('title 3', 'This is title 3', 30, 'television', 5, 10, 10, 'Image 3', 3),
+	   ('title 4', 'This is title 4', 40, 'Shoes', 5, 10, 10, 'Image 4', 1);
