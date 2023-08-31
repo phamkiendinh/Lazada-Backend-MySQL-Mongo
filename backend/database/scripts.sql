@@ -142,36 +142,47 @@ BEGIN
     DECLARE `inserted` BOOL DEFAULT 0;
     DECLARE `new_product_id` INT;
     
+    -- Read the first max warehouse current volume 
 	SELECT warehouse.id INTO `warehouseID`
     From warehouse
     ORDER BY (volume - current_volume) DESC LIMIT 1;
-
+	
+    -- Calculate the remaining volume of the gotten warehouse
     SELECT (volume - current_volume) INTO `remaining_warehouse_volume`
     FROM warehouse
     WHERE warehouse.id  = `warehouseID`;
     
+    -- Get the latest id if this product is added
     SELECT product.id + 1 INTO `new_product_id`
 	FROM product
 	ORDER BY product.id DESC  LIMIT 1;
 
-    
+    -- If product volume exceeds this warehouse then move the product to waiting list for admin to move
     IF product_volume > `remaining_warehouse_volume` THEN
 		INSERT INTO product (title, description, price, category, length, width, height, image, wid)
 		SELECT title, description, price, category, length, width, height, image, wid
 		FROM product_template
 		WHERE product_template.id = `product_template_id`;
+	-- If product volume doesn't exceed, update its warehouse id
 	ELSE
+		-- Copy data from product_template to new product and update its warehouse id. Seller can update this product information later
 		INSERT INTO product (title, description, price, category, length, width, height, image, wid)
 		SELECT title, description, price, category, length, width, height, image, wid
 		FROM product_template
 		WHERE product_template.id =  `product_template_id`;
         
+        -- Set product id to new warehouse
         UPDATE product
 		SET product.wid = `warehouseID`
 		WHERE product.id = `new_product_id`;
+        
+        -- Update warehouse current_volume
+        UPDATE warehouse
+        SET warehouse.current_volume = warehouse.current_volume + `product_volume`
+        WHERE warehouse.id = `warehouseID`;
     END IF;
     
-    SELECT `warehouseID`, `remaining_warehouse_volume`;
+    SELECT `warehouseID`, `new_product_id`;
 END $$
 DELIMITER ;
 
