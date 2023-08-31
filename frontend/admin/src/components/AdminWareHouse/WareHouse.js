@@ -14,7 +14,6 @@ function WareHouse() {
         })
         .catch(e => console.log(e))
         navigate(0);
-
     }
 
     return (

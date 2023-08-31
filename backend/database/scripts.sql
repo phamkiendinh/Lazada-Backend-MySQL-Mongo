@@ -1,4 +1,4 @@
--- CREATE DATABASE lazada;
+CREATE DATABASE lazada;
 USE lazada;
 
 -- Recreate tables
