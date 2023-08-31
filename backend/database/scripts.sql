@@ -61,7 +61,6 @@ CREATE TABLE product_template(
 
 CREATE INDEX address_index ON warehouse(address_id);
 CREATE INDEX warehouse_index ON product(wid);
-CREATE INDEX user_index ON product(uid);
 
 
 -- Transaction
