@@ -8,7 +8,7 @@ async function getAllWareHouse(req, res) {
     db.query(query, async (err, response) => {
         if (err) {
             console.log(err);
-            res.send(400);
+            res.send({status : 400});
         }
         else {
             // res.send(response);
@@ -24,7 +24,7 @@ async function getWareHouse(req, res) {
     db.query(query,[warehouseID], async (err, response) => {
         if (err) {
             console.log(err);
-            res.send(400);
+            res.send({status : 400});
         }
         else {
             res.send(response);
@@ -44,7 +44,7 @@ async function addWareHouse(req, res) {
         async (err, response) => {
         if (err) {
             console.log(err);
-            res.send(400);
+            res.send({status : 400});
             return;
         }
         else {
@@ -63,7 +63,7 @@ async function addWareHouse(req, res) {
                 async (err, response) => {
                     if (err) {
                         console.log(err);
-                        res.send(400);
+                        res.send({status : 400});
                         return;
                     }
                     else {
@@ -77,11 +77,11 @@ async function addWareHouse(req, res) {
                         async(err, response) => {
                             if (err) {
                                 console.log(err);
-                                res.send(400);
+                                res.send({status : 400});
                                 return;
                             }
                             else {
-                                res.send(200);
+                                res.send({status : 400});
                                 return;
                             }
                         })
@@ -92,28 +92,89 @@ async function addWareHouse(req, res) {
     });
 }
 
-function updateWareHouse(req, res) {
-
-}
-
-function deleteWareHouse (req, res) {
+async function countProducts(req, res) {
     var warehouseID = req.params.warehouseID;
-    console.log(warehouseID);
     var query = `
-    DELETE FROM warehouse
-    WHERE warehouse.id = ?;
+        SELECT COUNT(product.id) as count
+        FROM product
+        WHERE product.wid = ?;
     `;
     db.query(query, [warehouseID], async (err, response) => {
         if (err) {
             console.log(err);
-            res.send(400);
+            res.send({status : 400});
         }
         else {
-            res.send(200);
+            res.send(response[0]);
             return;
         }
     });
 }
+
+async function getAddressID(req, res) {
+    var warehouseID = req.params.warehouseID;
+
+    var query = `
+        SELECT id
+        FROM warehouse_address;
+    `;
+    db.query(query, [warehouseID], async (err, response) => {
+        if (err) {
+            console.log(err);
+            res.send({status : 400});
+        }
+        else {
+            // console.log(response);
+            res.send(response);
+            return;
+        }
+    });
+}
+
+function updateWareHouse(req, res) {
+    var warehouseID = req.params.warehouseID;
+    var warehouse_name = req.body.warehouse_name;
+    var address_id = req.body.address_id;
+    var volume = req.body.volume;
+    var current_volume = req.body.current_volume;
+
+    var query = `
+    UPDATE warehouse
+    SET warehouse.warehouse_name = ?, warehouse.address_id = ?, warehouse.volume = ?, warehouse.current_volume = ?
+    WHERE warehouse.id = ?;
+    `;
+
+    db.query(query, [warehouse_name,address_id,volume,0, warehouseID], async (err, response) => {
+        if (err) {
+            console.log(err);
+            res.send({status: 400});
+        }
+        else {
+            res.send({status: 200});
+            return;
+        }
+    });
+} 
+
+function deleteWareHouse (req, res) {
+    var warehouseID = req.params.warehouseID;
+
+    var deleteQuery = `
+    DELETE FROM warehouse
+    WHERE warehouse.id = ?;
+    `;
+    db.query(deleteQuery, [warehouseID], async (err, response) => {
+        if (err) {
+            console.log(err);
+            res.send({status : 400});
+        }
+        else {
+            res.send({status : 200});
+            return;
+        }
+    });
+}
+
 
 function getAllProduct(req, res) {
     var warehouseID = req.params.warehouseID;
@@ -125,7 +186,7 @@ function getAllProduct(req, res) {
     db.query(query, [warehouseID], async (err, response) => {
         if (err) {
             console.log(err);
-            res.send(400);
+            res.send({status : 400});
         }
         else {
             res.send(response);
@@ -144,7 +205,7 @@ function moveProduct(req, res) {
     db.query(query, [productID, old_warehouse_id, new_warehouse_id], async (err, response) => {
         if (err) {
             console.log(err);
-            res.send(400);
+            res.send({status : 400});
         }
         else {
             console.log(response);
@@ -154,12 +215,54 @@ function moveProduct(req, res) {
     });
 }   
 
+async function getAllWaitingProducts(req, res) {
+    var query = `
+        SELECT * from product
+        WHERE product.wid IS NULL;
+    `;
+    db.query(query, async (err, response) => {
+        if (err) {
+            console.log(err);
+            res.send({status : 400});
+        }
+        else {
+            console.log(response);
+            res.send(response);
+            return;
+        }
+    });
+}
+
+async function deleteProduct(req, res) {
+    var productID = req.params.productID;
+    var query = `
+        DELETE FROM product
+        WHERE product.id = ?;
+    `;
+    db.query(query, [productID], async (err, response) => {
+        if (err) {
+            console.log(err);
+            res.send({status : 400});
+        }
+        else {
+            console.log(response);
+            res.send({status : 200});
+            return;
+        }
+    });
+} 
+
+
 module.exports = {
     getAllWareHouse,
     getWareHouse,
+    countProducts,
     addWareHouse,
     deleteWareHouse,
+    getAddressID,
     getAllProduct,
     moveProduct,
-    updateWareHouse
+    updateWareHouse,
+    getAllWaitingProducts,
+    deleteProduct
 }

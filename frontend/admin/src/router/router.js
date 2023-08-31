@@ -32,6 +32,7 @@ import { loadWareHouse } from "../components/AdminWareHouse/UpdateWareHouse";
 //Action Function
 import UpdateTopCategory from "../components/AdminCategory/UpdateTopCategory";
 import UpdateSubCategory, {loadSubCategory} from "../components/AdminCategory/UpdateSubCategory";
+import ViewWaitProducts, { loadWaitProducts } from "../components/AdminWareHouse/ViewWaitProducts";
 export const routes = createBrowserRouter([
     {
         path : '/admin',
@@ -109,5 +110,11 @@ export const routes = createBrowserRouter([
         element : <ViewProducts />,
         loader: loadProducts,
         error : <Error />
-    }
+    },
+    {
+        path : '/admin/warehouse/products/waiting',
+        element : <ViewWaitProducts />,
+        loader: loadWaitProducts,
+        error : <Error />
+    },
 ]);

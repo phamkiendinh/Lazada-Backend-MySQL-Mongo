@@ -45,8 +45,8 @@ function CreateWareHouse() {
 
                             <input type="number" id="fieldInput" className="form-control d-none" name="current_volume" value={currentVolume}/>
 
-                            <label htmlFor="data" className="form-label fw-bold">Current Volume</label>
-                            <input type="number" id="fieldInput" className="form-control" name="current_volume" disabled value={currentVolume}/>
+                            <label htmlFor="current_volume" className="form-label fw-bold">Current Volume</label>
+                            <input type="number" id="fieldInput" className="form-control" name="current_volume" disabled value={0}/>
 
                         </div>
                         <button type="submit" className="btn btn-primary m-2">Create</button>
