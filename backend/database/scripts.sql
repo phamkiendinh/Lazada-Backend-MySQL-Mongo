@@ -2,6 +2,7 @@
 USE lazada;
 
 -- Recreate tables
+DROP TABLE IF EXISTS product_template;
 DROP TABLES IF EXISTS product;
 DROP TABLE IF EXISTS warehouse;
 DROP TABLE IF EXISTS warehouse_address;
@@ -133,38 +134,46 @@ END $$
 DELIMITER ;
 
 
--- DELIMITER $$
--- CREATE PROCEDURE `insert_product`(IN product_id INT, IN product_volume INT)
--- BEGIN
--- 	DECLARE `remaining_warehouse_volume` INT;
---     DECLARE `warehouseID` INT;
---     DECLARE `inserted` BOOL DEFAULT 0;
--- 	SELECT warehouse.id INTO `warehouseID`
---     From warehouse
---     ORDER BY (volume - current_volume) DESC LIMIT 1;
+DELIMITER $$
+CREATE PROCEDURE `insert_product`(IN product_template_id INT, IN product_volume INT)
+BEGIN
+	DECLARE `remaining_warehouse_volume` INT;
+    DECLARE `warehouseID` INT;
+    DECLARE `inserted` BOOL DEFAULT 0;
+    DECLARE `new_product_id` INT;
+    
+	SELECT warehouse.id INTO `warehouseID`
+    From warehouse
+    ORDER BY (volume - current_volume) DESC LIMIT 1;
 
---     SELECT (volume - current_volume) INTO `remaining_warehouse_volume`
---     FROM warehouse
---     WHERE warehouse.id  = `warehouseID`;
---     
---     IF product_volume < `remaining_warehouse_volume` THEN
--- 		
--- -- 	ELSE
--- 		SET `inserted` = 1;
---     END IF;
---     
---     SELECT `warehouseID`, `remaining_warehouse_volume`;
--- END $$
--- DELIMITER ;
+    SELECT (volume - current_volume) INTO `remaining_warehouse_volume`
+    FROM warehouse
+    WHERE warehouse.id  = `warehouseID`;
+    
+    SELECT product.id + 1 INTO `new_product_id`
+	FROM product
+	ORDER BY product.id DESC  LIMIT 1;
 
--- INSERT INTO product
--- SELECT title, description, price, category, length, width, height, image, wid
--- FROM product
--- WHERE product.id = 1;
-
--- CALL insert_product(1, 750);
--- DROP PROCEDURE insert_product;
--- drop procedure move_product; 
+    
+    IF product_volume > `remaining_warehouse_volume` THEN
+		INSERT INTO product (title, description, price, category, length, width, height, image, wid)
+		SELECT title, description, price, category, length, width, height, image, wid
+		FROM product_template
+		WHERE product_template.id = `product_template_id`;
+	ELSE
+		INSERT INTO product (title, description, price, category, length, width, height, image, wid)
+		SELECT title, description, price, category, length, width, height, image, wid
+		FROM product_template
+		WHERE product_template.id =  `product_template_id`;
+        
+        UPDATE product
+		SET product.wid = `warehouseID`
+		WHERE product.id = `new_product_id`;
+    END IF;
+    
+    SELECT `warehouseID`, `remaining_warehouse_volume`;
+END $$
+DELIMITER ;
 
 -- Sample Datas
 INSERT INTO warehouse_address (province, city, district, street, street_number) values ('Khanh Hoa', 'Nha Trang', 'Vinh Tho', 'Hai Ba Trung', '123');
@@ -178,8 +187,15 @@ INSERT INTO warehouse (address_id, warehouse_name, volume, current_volume) value
 -- Test, need delete later
 INSERT INTO warehouse (address_id, warehouse_name, volume, current_volume) values (3, "Da Nang Poor Market", 5000, 3000);
 
+INSERT INTO product_template (title, description, price, category, length, width, height, image, wid)
+VALUES ('title 1', 'This is title 1', 10, 'electronic', 5, 10, 15, 'Image 1', NULL),
+	   ('title 2', 'This is title 2', 20, 'mobilephone', 5, 5, 10, 'Image 2', NULL),
+       ('title 3', 'This is title 3', 30, 'television', 5, 10, 10, 'Image 3', NULL),
+	   ('title 4', 'This is title 4', 40, 'Shoes', 5, 10, 10, 'Image 4', NULL);
+
+
 INSERT INTO product (title, description, price, category, length, width, height, image, wid)
 VALUES ('title 1', 'This is title 1', 10, 'electronic', 5, 10, 15, 'Image 1', 1),
 	   ('title 2', 'This is title 2', 20, 'mobilephone', 5, 5, 10, 'Image 2', 2),
        ('title 3', 'This is title 3', 30, 'television', 5, 10, 10, 'Image 3', 3),
-	   ('title 4', 'This is title 4', 40, 'Shoes', 5, 10, 10, 'Image 4', 1);
+	   ('title 4', 'This is title 4', 40, 'Shoes', 5, 10, 10, 'Image 4', NULL);
