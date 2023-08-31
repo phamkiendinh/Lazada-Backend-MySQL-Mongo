@@ -1,65 +1,22 @@
 let list = document.getElementById('list');
 let filter = document.querySelector('.filter');
 let count = document.getElementById('count');
-let listProducts = [
-    {
-        id: 1,
-        name: 'Iphone 14 Pro Max',
-        description: 'This is title 1',
-        category: 'electronic',
-        price: 10,
-        image: 'Image 1.jpg',
-        wid: 1,
-        nature: {
-            length: 5,
-            width: 10,
-            height: 15
-        }
-    },
-    {
-        id: 2,
-        name: 'Iphone 14 Pro Max',
-        description: 'This is title 2',
-        category: 'mobilephone',
-        price: 10,
-        image: 'Image 2.jpg',
-        wid: 1,
-        nature: {
-            length: 5,
-            width: 10,
-            height: 15
-        }
-    },
-    {
-        id: 3,
-        name: 'Iphone 14 Pro Max',
-        description: 'This is title 3',
-        category: 'television',
-        price: 10,
-        image: 'Image 3.jpg',
-        wid: 1,
-        nature: {
-            length: 5,
-            width: 10,
-            height: 15
-        }
-    },
-    {
-        id: 4,
-        name: 'Iphone 14 Pro Max',
-        description: 'This is title 4',
-        category: 'shoes',
-        price: 10,
-        image: 'Image 4.jpg',
-        wid: 1,
-        nature: {
-            length: 5,
-            width: 10,
-            height: 15
-        }
-    },
-];
+let listProducts = [];
 let productFilter = listProducts;
+
+async function getProduct() {
+    const data = await fetch(`http://localhost:3001/product`)
+    .then(res => res.json())
+    .then(data => {
+        console.log(data);
+        return data;
+    })
+    .catch(e => {
+        console.log(e);
+    })
+    listProducts = data;
+}
+
 showProduct(productFilter);
 function showProduct(productFilter){
     count.innerText = productFilter.length;
