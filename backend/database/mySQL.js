@@ -7,8 +7,6 @@ const con = mysql.createPool({
   user: process.env.MYSQL_USER || 'root',
   password: process.env.MYSQL_PASSWORD || "RaidenShogun070599:)",
   port: process.env.MYSQL_PORT || 3306,
-
-  // Test With Local Database
 });
 
 con.getConnection(function (err) {

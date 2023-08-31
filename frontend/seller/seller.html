@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="seller.css">
+  <title>Add Product</title>
+</head>
+<body>
+  <header style="display:grid;grid-template-columns:repeat(4, 1fr);">
+    <a href="seller.html">Products</a>
+    <a href="order.html">Orders</a>
+  </header>
+  
+  <main>
+    <h3>List of items</h3>
+    <div id="product-list"></div>
+
+
+    <button id="create-button" class="create-button">Create</button>
+    <div class="overlay" id="overlay"></div>
+
+    <div id="create-form-container" class="form-container">
+      <form id="create-form" enctype="multipart/form-data">
+        <fieldset>
+          <legend>Add New Product</legend>
+          <div>
+            <label for="create-title">Title</label>
+            <input id="create-title-input" name="title" placeholder="Title" type="text" required>
+  
+            <label for="create-category">Category:</label>
+            <select id="create-category" name="category">
+              <option value="electronics">Electronics</option>
+              <option value="clothing">Clothing</option>
+              <option value="books">Books</option>
+              <option value="furniture">Furniture</option>
+              <option value="toys">Toys</option>
+            </select>
+
+            <label for="create-description">Description</label>
+            <textarea id="create-description-input" name="description" placeholder="Product Description" rows="4" cols="50" required></textarea>
+  
+            <label for="create-price">Price</label>
+            <input id="create-price-input" name="price" placeholder="Price" type="number" value="0" min="0" required>
+  
+            <label for="create-length">Length</label>
+            <input id="create-length-input" name="length" placeholder="Length" type="number" value="0" min="0" required>
+  
+            <label for="create-width">Width</label>
+            <input id="create-width-input" name="width" placeholder="Width" type="number" value="0" min="0" required>
+            
+            <label for="create-height">Height</label>
+            <input id="create-height-input" name="height" placeholder="Height" type="number" value="0" min="0" required>
+  
+            <label for="create-image">Image</label>
+            <input id="create-image-input" name="image" type="file" accept="image/*">
+          </div>
+          <div id="create-img-display" class="img-display">
+            <img id="create-product-img" src="" alt="Product Image">
+          </div>
+        </fieldset>      
+      </form>
+      
+      <div class="button-container">
+        <button id="cancel-button-1">Cancel</button>
+        <button id="form-create-button" class="create-button">Create</button>
+      </div>
+    </div>
+
+    <div id="update-form-container" class="form-container">
+      <form id="update-form" enctype="multipart/form-data">
+        <fieldset>
+          <legend>Update Product ID: <span id="update-id"></span></legend>
+          <div>
+            <label for="update-title">Title</label>
+            <input id="update-title-input" name="title" placeholder="Title" type="text" value="0" min="0" required>
+  
+            <label for="update-category">Category:</label>
+            <select id="update-category" name="category">
+              <option value="electronics">Electronics</option>
+              <option value="clothing">Clothing</option>
+              <option value="books">Books</option>
+              <option value="furniture">Furniture</option>
+              <option value="toys">Toys</option>
+            </select>
+
+            <label for="update-description">Description</label>
+            <textarea id="update-description-input" name="description" placeholder="Product Description" rows="4" cols="50" required></textarea>
+  
+            <label for="update-price">Price</label>
+            <input id="update-price-input" name="price" placeholder="Price" type="number" value="0" min="0" required>
+  
+            <label for="update-length">Length</label>
+            <input id="update-length-input" name="length" placeholder="Length" type="number" value="0" min="0" required>
+  
+            <label for="update-width">Width</label>
+            <input id="update-width-input" name="width" placeholder="Width" type="number" value="0" min="0" required>
+            
+            <label for="update-height">Height</label>
+            <input id="update-height-input" name="height" placeholder="Height" type="number" value="0" min="0" required>
+  
+            <label for="update-image">Image</label>
+            <input id="update-image-input" name="image" type="file" accept="image/*">
+          </div>
+          <div id="update-img-display" class="img-display">
+            <img id="update-product-img" src="" alt="Product Image">
+          </div>
+        </fieldset>      
+      </form>
+      
+      <div class="button-container">
+        <button id="cancel-button-2">Cancel</button>
+        <button id="form-delete-button" class="delete-button">Delete</button>
+        <button id="form-update-button" class="update-button">Update</button>
+      </div>
+    </div>
+
+  </main>
+  
+  <script src="seller.js"></script>
+</body>
+</html>
