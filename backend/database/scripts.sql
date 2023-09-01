@@ -4,8 +4,14 @@ USE lazada;
 -- Recreate tables
 DROP TABLE IF EXISTS product_template;
 DROP TABLES IF EXISTS product;
+DROP TABLE IF EXISTS customer;
+DROP TABLE IF EXISTS product_order;
 DROP TABLE IF EXISTS warehouse;
 DROP TABLE IF EXISTS warehouse_address;
+
+-- Drop Procedure
+DROP PROCEDURE IF EXISTS insert_product;
+DROP PROCEDURE IF EXISTS move_product;
 
 -- Create tables
 CREATE TABLE warehouse_address(
@@ -54,27 +60,23 @@ CREATE TABLE product (
     width DECIMAL(8,2),
     height DECIMAL(8,2),
     image VARCHAR(255),
+    template_id INT,
     wid INT,
     oid INT,
-    PRIMARY KEY(id),
-    FOREIGN KEY (wid) REFERENCES warehouse(id)
-)
-PARTITION BY RANGE (price) (
-    PARTITION p0 VALUES LESS THAN (1000),
-    PARTITION p1 VALUES LESS THAN (10000),
-    PARTITION p2 VALUES LESS THAN (50000),
-    PARTITION p3 VALUES LESS THAN MAXVALUE
+    PRIMARY KEY(id)
 );
 
 CREATE TABLE customer (
-	id INT,
-    customer_name VARCHAR(50)
+	id INT auto_increment,
+    customer_name VARCHAR(50),
+	PRIMARY KEY(id)
 );
 
 CREATE TABLE product_order (
-	id INT,
+	id INT auto_increment,
     cid INT NOT NULL,
     pid INT NOT NULL,
+    order_status INT DEFAULT 0,
     PRIMARY KEY(id)
 );
 
@@ -158,9 +160,10 @@ DELIMITER $$
 CREATE PROCEDURE `insert_product`(IN product_template_id INT, IN product_volume INT)
 BEGIN
 	DECLARE `remaining_warehouse_volume` INT;
-    DECLARE `warehouseID` INT;
+    DECLARE `warehouseID` INT DEFAULT 0;
     DECLARE `inserted` BOOL DEFAULT 0;
-    DECLARE `new_product_id` INT;
+    DECLARE `new_product_id` INT DEFAULT 0;
+    DECLARE `new_volume` INT DEFAULT 0;
     
     -- Read the first max warehouse current volume 
 	SELECT warehouse.id INTO `warehouseID`
@@ -183,6 +186,14 @@ BEGIN
 		SELECT title, description, price, category, length, width, height, image, wid
 		FROM product_template
 		WHERE product_template.id = `product_template_id`;
+        
+		-- Set product template_id to product_template id
+        UPDATE product
+		SET product.template_id = `product_template_id`
+		WHERE product.id = `new_product_id`;
+        
+        SET `warehouseID` = NULL;
+        
 	-- If product volume doesn't exceed, update its warehouse id
 	ELSE
 		-- Copy data from product_template to new product and update its warehouse id. Seller can update this product information later
@@ -191,44 +202,62 @@ BEGIN
 		FROM product_template
 		WHERE product_template.id =  `product_template_id`;
         
-        -- Set product id to new warehouse
+        -- Set product wid to new warehouse id
         UPDATE product
 		SET product.wid = `warehouseID`
+		WHERE product.id = `new_product_id`;
+        
+		-- Set product template_id to product_template id
+        UPDATE product
+		SET product.template_id = `product_template_id`
 		WHERE product.id = `new_product_id`;
         
         -- Update warehouse current_volume
         UPDATE warehouse
         SET warehouse.current_volume = warehouse.current_volume + `product_volume`
         WHERE warehouse.id = `warehouseID`;
+        
+        -- Get the new update volume
+        SELECT warehouse.current_volume INTO `new_volume`
+        FROM warehouse
+        WHERE warehouse.id = `warehouseID`;
     END IF;
     
-    SELECT `warehouseID`, `new_product_id`;
+    SELECT `new_volume`, `new_product_id`, `warehouseID`;
+END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE `order_product`(IN product_template_id INT, IN quantity INT)
+BEGIN
+
 END $$
 DELIMITER ;
 
 -- Sample Datas
+INSERT INTO customer (customer_name) VALUES ('Customer 1'), ('Customer 2');
+
 INSERT INTO warehouse_address (province, city, district, street, street_number) values ('Khanh Hoa', 'Nha Trang', 'Vinh Tho', 'Hai Ba Trung', '123');
 INSERT INTO warehouse_address (province, city, district, street, street_number) values ('Sai Gon', 'Ho Chi Minh', 'Quan 1', 'Ly Thai To', '245');
 INSERT INTO warehouse_address (province, city, district, street, street_number) values ('Da Nang', 'Da Nang', 'Da Nang', 'Nguyen Truong To', '789');
 
-INSERT INTO warehouse (address_id, warehouse_name, volume, current_volume) values (1, "Nha Trang ABC", 10000, 1000);
-INSERT INTO warehouse (address_id, warehouse_name, volume, current_volume) values (2, "Saigon Tiger", 20000, 2000);
-INSERT INTO warehouse (address_id, warehouse_name, volume, current_volume) values (3, "Da Nang Coop", 30000, 3000);
-
--- Test, need delete later
-INSERT INTO warehouse (address_id, warehouse_name, volume, current_volume) values (3, "Da Nang Poor Market", 5000, 3000);
-
-INSERT INTO product_template (title, description, price, category, length, width, height, image, wid)
-VALUES ('title 1', 'This is title 1', 10, 'electronic', 5, 10, 15, 'Image 1', NULL),
-	   ('title 2', 'This is title 2', 20, 'mobilephone', 5, 5, 10, 'Image 2', NULL),
-       ('title 3', 'This is title 3', 30, 'television', 5, 10, 10, 'Image 3', NULL),
-	   ('title 4', 'This is title 4', 40, 'Shoes', 5, 10, 10, 'Image 4', NULL);
+INSERT INTO warehouse (address_id, warehouse_name, volume, current_volume) values (1, "Nha Trang ABC", 10000, 75);
+INSERT INTO warehouse (address_id, warehouse_name, volume, current_volume) values (2, "Saigon Tiger", 10000, 1000);
+INSERT INTO warehouse (address_id, warehouse_name, volume, current_volume) values (3, "Da Nang Coop", 10000, 8000);
 
 
-INSERT INTO product (title, description, price, category, length, width, height, image, wid)
-VALUES ('title 1', 'This is title 1', 10, 'electronic', 5, 10, 15, 'Image 1', 1),
-	   ('title 2', 'This is title 2', 20, 'mobilephone', 5, 5, 10, 'Image 2', 2),
-       ('title 3', 'This is title 3', 30, 'television', 5, 10, 10, 'Image 3', 3),
-	   ('title 4', 'This is title 4', 40, 'Shoes', 5, 10, 10, 'Image 4', NULL);
+INSERT INTO product_template (title, description, price, category, length, width, height, image, wid, oid)
+VALUES ('title 1', 'This is title 1', 10, 'electronic', 5, 5, 5, 'Image 1', NULL, NULL),
+	   ('title 2', 'This is title 2', 20, 'furniture', 10, 10, 10, 'Image 2', NULL, NULL),
+       ('title 3', 'This is title 3', 30, 'phone', 20, 20, 20, 'Image 3', NULL, NULL),
+	   ('title 4', 'This is title 4', 40, 'chair', 40, 40, 40, 'Image 4', NULL, NULL);
+
+
+INSERT INTO product (title, description, price, category, length, width, height, image, template_id, wid)
+VALUES ('title 1', 'This is title 1', 10, 'electronic', 5, 5, 5, 'Image 1', 1, 1),
+	   ('title 2', 'This is title 2', 20, 'mobilephone', 10, 10, 10, 'Image 2', 2, 2),
+       ('title 3', 'This is title 3', 30, 'television', 20, 20, 20, 'Image 3', 3, 3),
+	   ('title 4', 'This is title 4', 40, 'Shoes', 40, 40, 40, 'Image 4', 4, NULL);
        
--- INSERT INTO product (title, description, price, category, length, width, height, image, wid) VALUES ('title 4', 'This is title 4', 40, 'electronic', 5, 10, 10, 'Image 4', NULL);
+INSERT INTO product_order (cid, pid) VALUES (1, 2);
+INSERT INTO product_order (cid, pid) VALUES (2, 3);
