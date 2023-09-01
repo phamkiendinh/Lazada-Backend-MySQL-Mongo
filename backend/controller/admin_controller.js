@@ -1,6 +1,26 @@
 const client = require('../database/mongoDB.js');
 const db = require('../database/mySQL.js');
 
+async function countProducts(req, res) {
+    console.log("Called");
+    var categoryName = req.params.categoryName;
+    var query = `
+        SELECT COUNT(product.id) as count
+        FROM product
+        WHERE product.category = ?;
+    `;
+    db.query(query, [categoryName], async (err, response) => {
+        if (err) {
+            console.log(err);
+            res.send({status : 400});
+        }
+        else {
+            res.send(response[0]);
+            return;
+        }
+    });
+}
+
 async function getOneAdmin(req, res) {
     try {
         var db = client.db('lazada');
@@ -302,6 +322,7 @@ async function updateSubCategory(req, res) {
 }
 
 module.exports = {
+    countProducts,
     getOneAdmin,
     getAllTopCategory,
     getTopCategory,

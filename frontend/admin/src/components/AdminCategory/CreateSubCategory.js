@@ -115,7 +115,7 @@ function CreateSubCategory () {
     return (
         <div className="row">
             <div className='col-2 left-panel mt-5'>
-            <button className="btn btn-primary w-100 m-1" onClick={() => navigate(-1)}>
+            <button className="btn btn-primary w-100 m-1" onClick={() => navigate(`/admin/category/${topCategory}`)}>
                 Go Back
             </button>
             </div>

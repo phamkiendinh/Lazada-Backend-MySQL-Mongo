@@ -43,7 +43,7 @@ function TopCategoryDetail() {
     return (
         <div>
             <div className="container d-flex justify-content-center">
-                <button className="btn btn-primary" onClick={() => navigate(-1)}>Go Back</button>
+                <button className="btn btn-primary" onClick={() => navigate('/admin/category')}>Go Back</button>
             </div>
             {items}
         </div>

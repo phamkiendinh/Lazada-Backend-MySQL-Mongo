@@ -5,8 +5,10 @@ const admin_controller = require('../controller/admin_controller');
 
 
 admin_router.get('/',admin_controller.getOneAdmin);
+admin_router.get('/category/:categoryName/count', admin_controller.countProducts);
 
 // Top Category
+
 admin_router.get('/category', admin_controller.getAllTopCategory);
 admin_router.post('/category/create', admin_controller.addTopCategory);
 admin_router.delete('/category/:categoryName/delete', admin_controller.deleteTopCategory);
@@ -19,6 +21,7 @@ admin_router.post('/category/:categoryName/create', admin_controller.addSubCateg
 admin_router.delete('/category/:categoryName/:subCategoryName/delete', admin_controller.deleteSubCategory);
 admin_router.get('/category/:categoryName/:subCategoryName', admin_controller.getSubCategory);
 admin_router.post('/category/:categoryName/:subCategoryName/update', admin_controller.updateSubCategory);
+
 
 
 module.exports = admin_router;

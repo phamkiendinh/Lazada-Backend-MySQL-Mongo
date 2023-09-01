@@ -4,23 +4,48 @@ function TopCategory() {
     const navigate = useNavigate();
     const categories = useLoaderData();
 
-    async function deleteTopCategory(category) {
-        await fetch(`http://localhost:3001/admin/category/${category}/delete`, {
-            method: 'DELETE'
-        })
+    async function countCategoryProduct(category) {
+        const data = await 
+        fetch(`http://localhost:3001/admin/category/${category}/count`)
         .then(res => res.json())
         .then(data => {
             return data;
         })
-        .catch(e => {
-            console.log(e);
-            return null;
-        })
-        navigate(0);
+        .catch(e => console.log(e))
+        return data;
+    }
+
+    async function deleteTopCategory(category) {
+        const response = await countCategoryProduct(category);
+        if (response.count === 0) {
+            await fetch(`http://localhost:3001/admin/category/${category}/delete`, {
+                method: 'DELETE'
+            })
+            .then(res => res.json())
+            .then(data => {
+                return data;
+            })
+            .catch(e => {
+                console.log(e);
+                return null;
+            })
+            navigate(0);
+        }
+        else {
+            alert("The products in this category needs to be emptied first before delete~");
+        }
+
     }
 
     async function updateTopCategory(category) {
-        navigate(`/admin/category/${category}/update`);
+        const response = await countCategoryProduct(category);
+        console.log(response);
+        if (response.count === 0) {
+            navigate(`/admin/category/${category}/update`);
+        }
+        else {
+            alert("The products in this category needs to be emptied first before delete~");
+        }
     }
     
     if (categories === null) {
@@ -28,7 +53,7 @@ function TopCategory() {
             <div>
                 <div className='row'>
                     <div className='col-2 left-panel mt-5'>
-                        <button className="btn btn-primary w-100 m-1" onClick={() => navigate(-1)}>
+                        <button className="btn btn-primary w-100 m-1" onClick={() => navigate('/admin')}>
                             Go Back
                         </button>
                     </div>
@@ -80,7 +105,7 @@ function TopCategory() {
         <div>
             <div className='row'>
                 <div className='col-2 left-panel mt-5'>
-                    <button className="btn btn-primary w-100 m-1" onClick={() => navigate(-1)}>
+                    <button className="btn btn-primary w-100 m-1" onClick={() => navigate('/admin')}>
                         Go Back
                     </button>
                 </div>

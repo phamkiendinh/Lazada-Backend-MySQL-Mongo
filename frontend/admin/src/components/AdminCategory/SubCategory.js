@@ -7,12 +7,23 @@ function SubCategory() {
     var url = window.location.href;
     const topCategory = url.slice(url.lastIndexOf('/') + 1);
 
+    async function countCategoryProduct(category) {
+        const data = await 
+        fetch(`http://localhost:3001/admin/category/${category}/count`)
+        .then(res => res.json())
+        .then(data => {
+            return data;
+        })
+        .catch(e => console.log(e))
+        return data;
+    }
+
     if (loadData === null || loadData.length === 0) {
         return (
             <div>
                 <div className='row'>
                     <div className='col-2 left-panel mt-5'>
-                        <button className="btn btn-primary w-100 m-1" onClick={() => navigate(-1)}>
+                        <button className="btn btn-primary w-100 m-1" onClick={() => navigate(`/admin/category/${topCategory}`)}>
                             Go Back
                         </button>
                     </div>
@@ -34,22 +45,37 @@ function SubCategory() {
     }
 
     async function updateSubCategory(category) {
-        navigate(`/admin/category/${topCategory}/${category}/update`);
+        const response = await countCategoryProduct(category);
+        console.log(response);
+        if (response.count === 0) {
+            navigate(`/admin/category/${topCategory}/${category}/update`);
+        }
+        else {
+            alert("The products in this category needs to be emptied first before delete~");
+        }
     }
 
     async function deleteSubCategory(category) {
-        await fetch(`http://localhost:3001/admin/category/${topCategory}/${category}/delete`, {
-            method: 'DELETE'
-        })
-        .then(res => res.json())
-        .then(data => {
-            return data;
-        })
-        .catch(e => {
-            console.log(e);
-            return null;
-        })
-        navigate(0);
+        const response = await countCategoryProduct(category);
+        if (response.count === 0) {
+            await fetch(`http://localhost:3001/admin/category/${topCategory}/${category}/delete`, {
+                method: 'DELETE'
+            })
+            .then(res => res.json())
+            .then(data => {
+                return data;
+            })
+            .catch(e => {
+                console.log(e);
+                return null;
+            })
+            navigate(0);
+        }
+        else {
+            alert("The products in this category needs to be emptied first before delete~");
+        }
+        
+
     }
 
     var data = Object.entries(loadData);
@@ -96,7 +122,7 @@ function SubCategory() {
         <div>
             <div className='row'>
                 <div className='col-2 left-panel mt-5'>
-                        <button className="btn btn-primary w-100 m-1" onClick={() => navigate(-1)}>
+                        <button className="btn btn-primary w-100 m-1" onClick={() => navigate(`/admin/category`)}>
                             Go Back
                         </button>
                 </div>

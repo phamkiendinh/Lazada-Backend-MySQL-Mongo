@@ -57,6 +57,18 @@ CREATE TABLE product_template(
     PRIMARY KEY(id)
 );
 
+CREATE TABLE customer(
+	id INT,
+    customer_name VARCHAR(50)
+);
+
+CREATE TABLE product_order (
+	id INT,
+    cid INT NOT NULL,
+    pid INT NOT NULL,
+    PRIMARY KEY(id)
+);
+
 -- Indexing
 
 CREATE INDEX address_index ON warehouse(address_id);
@@ -209,3 +221,5 @@ VALUES ('title 1', 'This is title 1', 10, 'electronic', 5, 10, 15, 'Image 1', 1)
 	   ('title 2', 'This is title 2', 20, 'mobilephone', 5, 5, 10, 'Image 2', 2),
        ('title 3', 'This is title 3', 30, 'television', 5, 10, 10, 'Image 3', 3),
 	   ('title 4', 'This is title 4', 40, 'Shoes', 5, 10, 10, 'Image 4', NULL);
+       
+-- INSERT INTO product (title, description, price, category, length, width, height, image, wid) VALUES ('title 4', 'This is title 4', 40, 'electronic', 5, 10, 10, 'Image 4', NULL);
