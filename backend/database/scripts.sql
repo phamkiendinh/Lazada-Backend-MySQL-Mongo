@@ -2,8 +2,8 @@
 USE lazada;
 
 -- Recreate tables
-DROP TABLE IF EXISTS product_template;
 DROP TABLES IF EXISTS product;
+DROP TABLE IF EXISTS product_template;
 DROP TABLE IF EXISTS customer;
 DROP TABLE IF EXISTS product_order;
 DROP TABLE IF EXISTS warehouse;
@@ -12,6 +12,7 @@ DROP TABLE IF EXISTS warehouse_address;
 -- Drop Procedure
 DROP PROCEDURE IF EXISTS insert_product;
 DROP PROCEDURE IF EXISTS move_product;
+DROP PROCEDURE IF EXISTS order_product;
 
 -- Create tables
 CREATE TABLE warehouse_address(
@@ -49,7 +50,6 @@ CREATE TABLE product_template(
     PRIMARY KEY(id)
 );
 
-
 CREATE TABLE product (
 	id INT auto_increment,
     title VARCHAR(255) NOT NULL,
@@ -75,7 +75,8 @@ CREATE TABLE customer (
 CREATE TABLE product_order (
 	id INT auto_increment,
     cid INT NOT NULL,
-    pid INT NOT NULL,
+    template_id INT NOT NULL,
+    product_quantity INT,
     order_status INT DEFAULT 0,
     PRIMARY KEY(id)
 );
@@ -227,10 +228,39 @@ BEGIN
 END $$
 DELIMITER ;
 
+
+-- Should declare a flag to check if all products can be ordered before calling this function for each template
 DELIMITER $$
 CREATE PROCEDURE `order_product`(IN product_template_id INT, IN quantity INT)
 BEGIN
-
+	-- Declare variables
+	DECLARE `_rollback` BOOL DEFAULT 0;
+    DECLARE `available_quantity` INT DEFAULT 0;
+	DECLARE CONTINUE HANDLER FOR SQLEXCEPTION SET `_rollback` = 1; 
+    SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+    START TRANSACTION;
+    
+    -- Recheck current product quantity in stock
+    SELECT COUNT(product.id) INTO `available_quantity`
+    FROM product
+    WHERE product.template_id = `product_template_id`;
+    
+    -- If not enough then roll back
+    IF `available_quantity` < quantity THEN
+		SET `_rollback` = 1;
+	END IF;
+    
+    -- If enough then run while loop to make multiple orders
+    
+    
+	IF `_rollback` THEN
+		ROLLBACK;
+	ELSE
+		COMMIT;
+	END IF;
+    
+    SELECT `available_quantity`;
+    -- WHILE quantity
 END $$
 DELIMITER ;
 
@@ -258,6 +288,6 @@ VALUES ('title 1', 'This is title 1', 10, 'electronic', 5, 5, 5, 'Image 1', 1, 1
 	   ('title 2', 'This is title 2', 20, 'mobilephone', 10, 10, 10, 'Image 2', 2, 2),
        ('title 3', 'This is title 3', 30, 'television', 20, 20, 20, 'Image 3', 3, 3),
 	   ('title 4', 'This is title 4', 40, 'Shoes', 40, 40, 40, 'Image 4', 4, NULL);
-       
-INSERT INTO product_order (cid, pid) VALUES (1, 2);
-INSERT INTO product_order (cid, pid) VALUES (2, 3);
+
+INSERT INTO product_order (cid, template_id, product_quantity) VALUES (1, 2, 1);
+INSERT INTO product_order (cid, template_id, product_quantity) VALUES (2, 3, 1);
