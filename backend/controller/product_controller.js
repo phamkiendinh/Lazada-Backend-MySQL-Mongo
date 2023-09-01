@@ -7,7 +7,7 @@ async function getAllProduct(req, res) {
     db.query(query, async (err, response) => {
         if (err) {
             console.log(err);
-            res.send(400);
+            res.send({status:400});
         }
         else {
             console.log(response);

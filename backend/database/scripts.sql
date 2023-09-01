@@ -28,21 +28,6 @@ CREATE TABLE warehouse (
     FOREIGN KEY (address_id) REFERENCES warehouse_address(id)
 ) ENGINE=InnoDB;	
 
-CREATE TABLE product (
-	id INT auto_increment,
-    title VARCHAR(255) NOT NULL,
-    description TEXT,
-    price DECIMAL(10,2) NOT NULL,
-    category VARCHAR(100),
-    length DECIMAL(8,2),
-    width DECIMAL(8,2),
-    height DECIMAL(8,2),
-    image VARCHAR(255),
-    wid INT,
-    PRIMARY KEY(id),
-    FOREIGN KEY (wid) REFERENCES warehouse(id)
-);
-
 CREATE TABLE product_template(
 	id INT auto_increment,
     title VARCHAR(255) NOT NULL,
@@ -54,14 +39,49 @@ CREATE TABLE product_template(
     height DECIMAL(8,2),
     image VARCHAR(255),
     wid INT,
+    oid INT,
     PRIMARY KEY(id)
+);
+
+CREATE TABLE product (
+	id INT auto_increment,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    price DECIMAL(10,2) NOT NULL,
+    category VARCHAR(100),
+    length DECIMAL(8,2),
+    width DECIMAL(8,2),
+    height DECIMAL(8,2),
+    image VARCHAR(255),
+    wid INT,
+    oid INT,
+    PRIMARY KEY(id),
+    FOREIGN KEY (wid) REFERENCES warehouse(id)
+)
+PARTITION BY RANGE (price) (
+    PARTITION p0 VALUES LESS THAN (1000),
+    PARTITION p1 VALUES LESS THAN (10000),
+    PARTITION p2 VALUES LESS THAN (50000),
+    PARTITION p3 VALUES LESS THAN MAXVALUE
+);
+
+CREATE TABLE product_order (
+	id INT,
+    cid INT NOT NULL,
+    pid INT NOT NULL,
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE customer (
+	id INT,
+    customer_name VARCHAR(50)
 );
 
 -- Indexing
 
 CREATE INDEX address_index ON warehouse(address_id);
 CREATE INDEX warehouse_index ON product(wid);
-
+CREATE INDEX order_index ON product(oid);
 
 -- Transaction
 -- Ensuring total number of products in all warehouses is consistent before and after a move
