@@ -71,13 +71,13 @@ CREATE TABLE customer (
     customer_name VARCHAR(50),
 	PRIMARY KEY(id)
 );
-
+-- Accept = 1, Reject = 0
 CREATE TABLE product_order (
 	id INT auto_increment,
     cid INT NOT NULL,
     template_id INT NOT NULL,
     product_quantity INT,
-    order_status INT DEFAULT 0,
+    order_status INT DEFAULT -1,
     PRIMARY KEY(id)
 );
 
@@ -176,7 +176,7 @@ BEGIN
     FROM warehouse
     WHERE warehouse.id  = `warehouseID`;
     
-    -- Get the latest id if this product is added
+    -- Get the latest id if this product is added, need to add 1
     SELECT product.id + 1 INTO `new_product_id`
 	FROM product
 	ORDER BY product.id DESC  LIMIT 1;
@@ -231,27 +231,61 @@ DELIMITER ;
 
 -- Should declare a flag to check if all products can be ordered before calling this function for each template
 DELIMITER $$
-CREATE PROCEDURE `order_product`(IN product_template_id INT, IN quantity INT)
+CREATE PROCEDURE `order_product`(IN product_template_id INT, IN customer_id INT, IN product_quantity INT)
 BEGIN
 	-- Declare variables
 	DECLARE `_rollback` BOOL DEFAULT 0;
     DECLARE `available_quantity` INT DEFAULT 0;
-	DECLARE CONTINUE HANDLER FOR SQLEXCEPTION SET `_rollback` = 1; 
+    DECLARE `new_product_order_id` INT DEFAULT 0;
+    DECLARE `customer_id_check` INT DEFAULT 0;
+-- 	DECLARE CONTINUE HANDLER FOR SQLEXCEPTION SET `_rollback` = 1; 
     SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
     START TRANSACTION;
     
-    -- Recheck current product quantity in stock
+    SELECT COUNT(customer.id) INTO `customer_id_check`
+    FROM customer
+    WHERE customer.id = `customer_id`;
+    
+    -- Recheck current product quantity in stock, make sure it is not in any order and product is stored in a warehouse
     SELECT COUNT(product.id) INTO `available_quantity`
     FROM product
-    WHERE product.template_id = `product_template_id`;
+    WHERE product.template_id = `product_template_id` AND product.oid IS NULL AND product.wid IS NOT NULL;
     
     -- If not enough then roll back
-    IF `available_quantity` < quantity THEN
+    IF `available_quantity` < `product_quantity` THEN
 		SET `_rollback` = 1;
 	END IF;
     
-    -- If enough then run while loop to make multiple orders
+    -- If no stock available, rollback
+    IF `available_quantity` <= 0 THEN
+		SET `_rollback` = 1;
+	END IF;
     
+    -- Customer id check
+    IF `customer_id_check` = 0 THEN
+		SET `_rollback` = 1;
+	END IF;
+    
+    
+	IF `_rollback` = 0 THEN
+		-- Create new order
+		INSERT INTO product_order(cid, template_id, product_quantity) VALUES(`customer_id`, `product_template_id`, `product_quantity`);
+		
+		-- Get the newly created product order
+		SELECT product_order.id INTO `new_product_order_id`
+		FROM product_order
+		ORDER BY product_order.id DESC LIMIT 1;
+        
+		-- If enough then run while loop to update the product's order id to new added product_order id 
+		WHILE `product_quantity` > 0 DO
+			SET `product_quantity` = `product_quantity` - 1;
+			
+			UPDATE product
+			SET product.oid = `new_product_order_id`
+			WHERE product.template_id = `product_template_id` AND product.oid IS NULL
+			LIMIT 1;
+		END WHILE;
+    END IF;
     
 	IF `_rollback` THEN
 		ROLLBACK;
@@ -259,7 +293,7 @@ BEGIN
 		COMMIT;
 	END IF;
     
-    SELECT `available_quantity`;
+    SELECT `new_product_order_id`, `_rollback`, `available_quantity`, `product_quantity`, `customer_id`, `product_template_id`;
     -- WHILE quantity
 END $$
 DELIMITER ;
@@ -271,7 +305,7 @@ INSERT INTO warehouse_address (province, city, district, street, street_number) 
 INSERT INTO warehouse_address (province, city, district, street, street_number) values ('Sai Gon', 'Ho Chi Minh', 'Quan 1', 'Ly Thai To', '245');
 INSERT INTO warehouse_address (province, city, district, street, street_number) values ('Da Nang', 'Da Nang', 'Da Nang', 'Nguyen Truong To', '789');
 
-INSERT INTO warehouse (address_id, warehouse_name, volume, current_volume) values (1, "Nha Trang ABC", 10000, 75);
+INSERT INTO warehouse (address_id, warehouse_name, volume, current_volume) values (1, "Nha Trang ABC", 10000, 150);
 INSERT INTO warehouse (address_id, warehouse_name, volume, current_volume) values (2, "Saigon Tiger", 10000, 1000);
 INSERT INTO warehouse (address_id, warehouse_name, volume, current_volume) values (3, "Da Nang Coop", 10000, 8000);
 
@@ -285,9 +319,11 @@ VALUES ('title 1', 'This is title 1', 10, 'electronic', 5, 5, 5, 'Image 1', NULL
 
 INSERT INTO product (title, description, price, category, length, width, height, image, template_id, wid)
 VALUES ('title 1', 'This is title 1', 10, 'electronic', 5, 5, 5, 'Image 1', 1, 1),
-	   ('title 2', 'This is title 2', 20, 'mobilephone', 10, 10, 10, 'Image 2', 2, 2),
-       ('title 3', 'This is title 3', 30, 'television', 20, 20, 20, 'Image 3', 3, 3),
-	   ('title 4', 'This is title 4', 40, 'Shoes', 40, 40, 40, 'Image 4', 4, NULL);
+	   ('title 2', 'This is title 2', 20, 'furniture', 10, 10, 10, 'Image 2', 2, 2),
+       ('title 3', 'This is title 3', 30, 'phone', 20, 20, 20, 'Image 3', 3, 3),
+	   ('title 4', 'This is title 4', 40, 'chair', 40, 40, 40, 'Image 4', 4, NULL),
+	   ('title 5', 'This is title 5', 50, 'electronic', 5, 5, 5, 'Image 1', 1, 1);
 
-INSERT INTO product_order (cid, template_id, product_quantity) VALUES (1, 2, 1);
-INSERT INTO product_order (cid, template_id, product_quantity) VALUES (2, 3, 1);
+-- CALL order_product(1,1,2); -- Order 2 products from template 1 for customer 1
+-- CALL order_product(2,2,1); -- Order 1 product from template 2 for customer 2
+-- ROLLBACK;
