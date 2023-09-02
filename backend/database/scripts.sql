@@ -9,10 +9,17 @@ DROP TABLE IF EXISTS product_order;
 DROP TABLE IF EXISTS warehouse;
 DROP TABLE IF EXISTS warehouse_address;
 
+-- Drop triggers
+DROP TRIGGER IF EXISTS complete_order_trigger;
+
 -- Drop Procedure
+DROP PROCEDURE IF EXISTS clean_up_order;
+DROP PROCEDURE IF EXISTS accept_order;
+DROP PROCEDURE IF EXISTS reject_order;
 DROP PROCEDURE IF EXISTS insert_product;
 DROP PROCEDURE IF EXISTS move_product;
 DROP PROCEDURE IF EXISTS order_product;
+
 
 -- Create tables
 CREATE TABLE warehouse_address(
@@ -157,6 +164,7 @@ END $$
 DELIMITER ;
 
 
+
 DELIMITER $$
 CREATE PROCEDURE `insert_product`(IN product_template_id INT, IN product_volume INT)
 BEGIN
@@ -238,7 +246,7 @@ BEGIN
     DECLARE `available_quantity` INT DEFAULT 0;
     DECLARE `new_product_order_id` INT DEFAULT 0;
     DECLARE `customer_id_check` INT DEFAULT 0;
--- 	DECLARE CONTINUE HANDLER FOR SQLEXCEPTION SET `_rollback` = 1; 
+	DECLARE CONTINUE HANDLER FOR SQLEXCEPTION SET `_rollback` = 1; 
     SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
     START TRANSACTION;
     
@@ -298,6 +306,85 @@ BEGIN
 END $$
 DELIMITER ;
 
+DELIMITER $$
+CREATE PROCEDURE `accept_order`(IN order_id INT)
+BEGIN
+	-- Find all products that have order id equal to this order id to calculate its volume
+    -- Then subtract product volume from its warehouse volume
+    -- Delete the product
+    -- When all products deleted, delete the order as well
+	DECLARE `quantity` INT DEFAULT 0; -- Store total product in the order
+    DECLARE `product_id` INT DEFAULT 0; -- Store current product id each while loop
+    DECLARE `product_volume` INT DEFAULT 0; -- Store current product volume
+    DECLARE `warehouse_id` INT DEFAULT 0; -- Store current product warehouse ID
+    
+    SELECT COUNT(product.id) INTO `quantity`
+    FROM product
+    WHERE product.oid = `order_id`;
+    
+    WHILE `quantity` > 0 DO
+		SET `quantity` = `quantity` - 1;
+        
+		SELECT product.id INTO `product_id`
+        FROM product
+        WHERE product.oid = `order_id` LIMIT 1;
+        
+        SELECT product.length * product.width * product.height INTO `product_volume`
+        FROM product
+        WHERE product.id = `product_id`;
+        
+        SELECT product.wid INTO `warehouse_id`
+        FROM product
+        WHERE product.id = `product_id`;
+        
+        UPDATE warehouse
+        SET warehouse.current_volume = warehouse.current_volume - `product_volume`
+        WHERE warehouse.id = `warehouse_id`;
+        
+        DELETE FROM product
+        WHERE product.id = `product_id`;
+			
+    END WHILE;
+END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE `reject_order`(IN order_id INT)
+BEGIN
+	-- Find all products that have order id equal to this order id
+    -- Change their order id to null
+	UPDATE product
+	SET product.oid = NULL
+	WHERE product.oid = `order_id`;
+END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE `clean_up_order`()
+BEGIN
+	-- Find all orders that are already accepted or rejected and delete them
+	DELETE FROM product_order
+    WHERE product_order.order_status = 1 OR product_order.order_status = 0;
+END $$
+DELIMITER ;
+
+-- Triggers
+DELIMITER $$
+CREATE TRIGGER complete_order_trigger
+AFTER UPDATE ON product_order 
+FOR EACH ROW
+BEGIN
+	IF NEW.order_status = 1 THEN
+		CALL accept_order(NEW.id);
+    END IF;
+    
+	IF NEW.order_status = 0 THEN
+		CALL reject_order(NEW.id);
+    END IF;
+    
+END $$
+DELIMITER ;
+
 -- Sample Datas
 INSERT INTO customer (customer_name) VALUES ('Customer 1'), ('Customer 2');
 
@@ -321,7 +408,7 @@ INSERT INTO product (title, description, price, category, length, width, height,
 VALUES ('title 1', 'This is title 1', 10, 'electronic', 5, 5, 5, 'Image 1', 1, 1),
 	   ('title 2', 'This is title 2', 20, 'furniture', 10, 10, 10, 'Image 2', 2, 2),
        ('title 3', 'This is title 3', 30, 'phone', 20, 20, 20, 'Image 3', 3, 3),
-	   ('title 4', 'This is title 4', 40, 'chair', 40, 40, 40, 'Image 4', 4, NULL),
+	   ('title 4', 'This is title 4', 40, 'chair', 5, 5, 5, 'Image 4', 4, NULL),
 	   ('title 5', 'This is title 5', 50, 'electronic', 5, 5, 5, 'Image 1', 1, 1);
 
 -- CALL order_product(1,1,2); -- Order 2 products from template 1 for customer 1

@@ -23,7 +23,6 @@ async function countProducts(req, res) {
     db.query(query, [templateID], async (err, response) => {
         if (err) {
             console.log(err);
-4
 
             res.send({status:400});
         }
@@ -34,6 +33,9 @@ async function countProducts(req, res) {
         }
     });
 }
+
+
+
 
 module.exports = {
     getAllProduct,
