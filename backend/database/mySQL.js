@@ -5,7 +5,7 @@ const con = mysql.createPool({
   host: process.env.MYSQL_HOST || 'localhost',
   database: process.env.MYSQL_DATABASE || 'lazada',
   user: process.env.MYSQL_USER || 'root',
-  password: process.env.MYSQL_PASSWORD || "RaidenShogun070599:)",
+  password: process.env.MYSQL_PASSWORD || "Kien1712",
   port: process.env.MYSQL_PORT || 3306,
 });
 

@@ -5,19 +5,24 @@ let listProducts = [];
 let productFilter = listProducts;
 
 async function getProduct() {
-    const data = await fetch(`http://localhost:3001/product`)
-    .then(res => res.json())
-    .then(data => {
-        console.log(data);
-        return data;
-    })
-    .catch(e => {
-        console.log(e);
-    })
+    const data = await fetch(`http://localhost:3001/product`);
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json();
     listProducts = data;
+
+    // Call showProduct to display the product data in HTML
+    showProduct(listProducts);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
 }
 
-showProduct(productFilter);
+getProduct();
+
+
 function showProduct(productFilter){
     count.innerText = productFilter.length;
     list.innerHTML = '';
@@ -29,16 +34,19 @@ function showProduct(productFilter){
         let newImage = new Image();
         newImage.src = item.image;
         newItem.appendChild(newImage);
+
         // create name product
         let newTitle = document.createElement('div');
         newTitle.classList.add('title');
         newTitle.innerText = item.name;
         newItem.appendChild(newTitle);
+
         //create product's description
         let newDescription = document.createElement('div');
         newDescription.classList.add('description');
         newDescription.innerText = item.description;
         newItem.appendChild(newDescription);
+        
         // create price
         let newPrice = document.createElement('div');
         newPrice.classList.add('price');
@@ -48,45 +56,51 @@ function showProduct(productFilter){
         list.appendChild(newItem);
     });
 }
-filter.addEventListener('submit', function(event){
+
+
+// Add event listener for the filter form submission
+filter.addEventListener('submit', function (event) {
     event.preventDefault();
+  
+    // Get filter values
     let valueFilter = event.target.elements;
+  
     productFilter = listProducts.filter(item => {
-        // check category
-        if(valueFilter.category.value != ''){
-            if(item.nature.type != valueFilter.category.value){
-                return false;
-            }
+      // Check category
+      if (valueFilter.category.value !== '') {
+        if (item.category !== valueFilter.category.value) {
+          return false;
         }
-        // check warehouse available
-        if(valueFilter.wid.value != ''){
-            if(!item.nature.color.includes(valueFilter.color.value)){
-                return false;
-            }
+      }
+      // Check warehouse available
+      if (valueFilter.wid.value !== '') {
+        if (!item.warehouse.includes(parseInt(valueFilter.wid.value))) {
+          return false;
         }
-        // check name
-        if(valueFilter.name.value != ''){
-            if(!item.name.includes(valueFilter.name.value)){
-                return false;
-            }
+      }
+      // Check name
+      if (valueFilter.name.value !== '') {
+        if (!item.name.includes(valueFilter.name.value)) {
+          return false;
         }
-        // check min price
-        if(valueFilter.minPrice.value != ''){
-            if(item.price < valueFilter.minPrice.value){
-                return false;
-            }
+      }
+      // Check min price
+      if (valueFilter.minPrice.value !== '') {
+        if (item.price < parseFloat(valueFilter.minPrice.value)) {
+          return false;
         }
-        //  check max price
-        if(valueFilter.maxPrice.value != ''){
-            if(item.price > valueFilter.maxPrice.value){
-                return false;
-            }
+      }
+      // Check max price
+      if (valueFilter.maxPrice.value !== '') {
+        if (item.price > parseFloat(valueFilter.maxPrice.value)) {
+          return false;
         }
-
-
-        return true;
-    })
+      }
+  
+      return true;
+    });
+  
+    // Update the displayed products based on the filter
     showProduct(productFilter);
-})
-
-console.log(listProducts);
+  });
+  

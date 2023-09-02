@@ -37,7 +37,7 @@
                 </select>
             </div>
             <div class="item">
-                <label for="">Warehouse available</label>
+                <label for="">Warehouse</label>
                 <select name="wid">
                     <option value="">---</option>
                     <option value="">1</option>
@@ -73,16 +73,56 @@
         </form>
         
 <div class="countResults">
-            Found <b id="count">6</b> results
+            Found <b id="count">loading...</b> results
         </div>
-        <div id="list">
-            
-        </div>
-</div>
-    
 
-    <script src="script/search.js"></script>
-    <script src="script/sort.js"></script>
+        <div class="products"></div>
+    </div>
+
+    </div>
+    <script>
+        fetch('http://localhost:3001/product')
+            .then(response => response.json())
+            .then(data => {
+                const countElement = document.getElementById('count');
+                const productsContainer = document.querySelector('.products');
+
+                // Update the count
+                countElement.textContent = ` ${data.length}`;
+
+                // Update the product list
+                data.forEach(product => {
+                    const productDiv = document.createElement('div');
+                    productDiv.classList.add('item');
+
+                    // Create an object to store product data
+                    const productData = {
+                        title: ` Title: ${product.title}`,
+                        description: `Description: ${product.description}`,
+                        price: `Price: $${parseFloat(product.price).toFixed(2)}`,
+                        category: `Category: ${product.category}`,
+                        wid: `Warehouse ID: ${product.wid}`
+                    };
+
+                    // Create and append HTML elements for product data
+                    for (const key in productData) {
+                        const element = document.createElement('p');
+                        element.textContent = productData[key];
+                        productDiv.appendChild(element);
+                    }
+
+                    // Append the product to the product list
+                    productsContainer.appendChild(productDiv);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+    </script>
+</div>
+  
+<script src="script/search.js"></script>
+<script src="script/sort.js"></script>
 
 </body>
 </html>

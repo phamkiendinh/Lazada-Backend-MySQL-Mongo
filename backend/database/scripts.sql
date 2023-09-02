@@ -1,3 +1,6 @@
+-- select * from product;
+-- drop procedure move_product;
+-- drop procedure insert_product;
 -- CREATE DATABASE lazada;
 USE lazada;
 
@@ -61,7 +64,6 @@ CREATE TABLE product_template(
 
 CREATE INDEX address_index ON warehouse(address_id);
 CREATE INDEX warehouse_index ON product(wid);
-CREATE INDEX user_index ON product(uid);
 
 
 -- Transaction
