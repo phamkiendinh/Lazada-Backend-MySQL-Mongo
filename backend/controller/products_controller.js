@@ -2,6 +2,7 @@ const db = require('../database/mySQL.js')
 const fs = require('fs')
 const multer = require('multer');
 const path = require('path');
+const client = require('../database/mongoDB.js');
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -16,24 +17,51 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 async function create_product(req, res) {
-    console.log(req.body);
     const { title, description, price, category, length, width, height } = req.body;
-    const image = req.file ? req.file.filename : undefined;
+    const image = req.file ? req.file.filename : "thumbnail.png";
+    var attributes = JSON.parse(req.body.category_attr)
 
     const query = `
-        INSERT INTO products (title, description, price, category, length, width, height, image)
+        INSERT INTO product (title, description, price, category, length, width, height, image)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?);
     `;
     const values = [title, description, price, category, length, width, height, image];
     
-    db.query(query, values, async (err, result) => {
-        if (err) {
-            console.error('Error creating product:', err);
-            res.status(500).json({ error: 'Error creating product' });
-        } else {
-            res.status(201).json({ message: 'Product created successfully', productId: result.insertId });
-        }
-    });
+    try {
+        db.query(query, values, async (err, result) => {
+            if (err) {
+                console.error('Error creating product:', err);
+                res.status(500).json({ error: 'Error creating product' });
+            } else {
+                var collection = client.db('lazada').collection('product_template');
+
+                attributes['pid'] = result.insertId
+
+                collection.insertOne(attributes, async (err, result) => {
+                    if (err) {
+                        console.error('Error inserting document:', err);
+                    } else {
+                        console.log('Inserted document into "product" collection');
+                    }
+                });
+
+                collection = client.db('lazada').collection('product');
+                const data = { pid: result.insertId, category: category }
+
+                collection.insertOne(data, async (err, result) => {
+                    if (err) {
+                        console.error('Error inserting document:', err);
+                    } else {
+                        console.log('Inserted document into "product" collection');
+                    }
+                });
+
+                res.status(200).json({ message: 'Product created successfully', productId: result.insertId });
+            }
+        });
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 async function update_product(req, res) {
@@ -44,9 +72,9 @@ async function update_product(req, res) {
     const newImage = req.file ? req.file.filename : undefined;
 
     const query = `
-        UPDATE products
-        SET products.title = ?, products.description = ?, products.price = ?, products.category = ?, products.length = ?, products.width = ?, products.height = ? ${newImage !== undefined ? ', products.image = ?' : ''}
-        WHERE products.id = ?;
+        UPDATE product
+        SET product.title = ?, product.description = ?, product.price = ?, product.category = ?, product.length = ?, product.width = ?, product.height = ? ${newImage !== undefined ? ', product.image = ?' : ''}
+        WHERE product.id = ?;
     `;
 
     const values = [title, description, price, category, length, width, height];
@@ -67,7 +95,17 @@ async function update_product(req, res) {
 
 async function delete_product(req, res) {
     const productId = req.params.id;
-    const getImageQuery = `SELECT image FROM products WHERE id = ?`;
+
+    var collection = client.db('lazada').collection('product_template'); 
+    const result = await collection.deleteOne({pid : productId});
+
+    if (result.deletedCount === 1) {
+        console.log(`Document with pid ${productId} deleted successfully.`);
+    } else {
+        console.log(`No document with pid ${productId} found for deletion.`);
+    }
+
+    const getImageQuery = `SELECT image FROM product WHERE id = ?`;
     db.query(getImageQuery, [productId], async (err, result) => {
         if (err) {
             console.error('Error retrieving image filename:', err);
@@ -82,20 +120,21 @@ async function delete_product(req, res) {
 
         const imageFilename = result[0].image;
 
-        const deleteProductQuery = `DELETE FROM products WHERE id = ?`;
+        const deleteProductQuery = `DELETE FROM product WHERE id = ?`;
         db.query(deleteProductQuery, [productId], async (err, result) => {
             if (err) {
                 console.error('Error deleting product:', err);
                 res.status(500).json({ error: 'Error deleting product' });
             } else {
-                // Delete the image file from the folder
-                const imagePath = path.join('../Mysql-Mongo/frontend/seller/Assets', imageFilename);
-                fs.unlink(imagePath, (err) => {
-                    if (err) {
-                        console.error('Error deleting image file:', err);
-                    }
-                });
-
+                console.log(imageFilename)
+                if (imageFilename != "thumbnail.png") {
+                    const imagePath = path.join('../frontend/seller/Assets', imageFilename);
+                    fs.unlink(imagePath, (err) => {
+                        if (err) {
+                            console.error('Error deleting image file:', err);
+                        }
+                    });
+                }
                 res.status(200).json({ message: 'Product and image deleted successfully' });
             }
         });
@@ -104,7 +143,7 @@ async function delete_product(req, res) {
 
 async function get_product(req, res) {
     const productId = req.params.id;
-    const query = `SELECT * FROM products WHERE id = ?`;
+    const query = `SELECT * FROM product WHERE id = ?`;
     
     db.query(query, [productId], async (err, results) => {
         if (err) {
@@ -122,12 +161,12 @@ async function get_product(req, res) {
 }
 
 async function get_all_products(req, res) {
-    const query = `SELECT id, title, description, price, image FROM products`;
+    const query = `SELECT id, title, description, price, image FROM product`;
 
     db.query(query, async (err, results) => {
         if (err) {
-            console.error('Error fetching products:', err);
-            res.status(500).json({ error: 'Error fetching products' });
+            console.error('Error fetching product:', err);
+            res.status(500).json({ error: 'Error fetching product' });
         } else {
             res.status(200).json(results);
         }

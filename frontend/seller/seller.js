@@ -6,21 +6,89 @@ const maxHeight = 350;
 const overlay = document.getElementById('overlay');
 const createFormContainer = document.getElementById('create-form-container');
 const updateFormContainer = document.getElementById('update-form-container');
+const categoryFormContainer = document.getElementById('category-form-container');
+const createSelectedMenu = document.getElementById('create-category')
+const updateSelectedMenu = document.getElementById('update-category')
 
-fetch ('http://127.0.0.1:3001/admin/category')
+
+const createCateAttrDiv = document.getElementById('create-category-attributes')
+const updateCateAttrDiv = document.getElementById('update-category-attributes')
+
+fetch('http://127.0.0.1:3001/products')
     .then(response => response.json())
-    .then(categories => {
-        const createSelectedMenu = document.getElementById('create-category')
-        const updateSelectedMenu = document.getElementById('update-category')
-        categories.forEach(category => {
-            createSelectedMenu.innerHTML += `<option value="${category.name}">${category.name}</option>`;
-            updateSelectedMenu.innerHTML += `<option value="${category.name}">${category.name}</option>`;
+    .then(products => {
+        products.forEach(product => {
+            productList.innerHTML += 
+                `<div data-product-id="${product.id}" class="product-item">
+                    <div class="product-image">
+                        <img src="Assets/${product.image}" alt="${product.title}">
+                    </div>
+                    <h3 class="product-name">${product.title}</h3>
+                    <p class="product-price">${product.price}</p>
+                </div>`;
+        });
+
+
+        const productItems = document.querySelectorAll('.product-item');
+        productItems.forEach(productItem => {
+            productItem.addEventListener('click', async () => {
+                const productId = productItem.getAttribute('data-product-id');
+                fillInUpdateForm(productId);
+            });
         });
     })
     .catch(error => {
         console.error('Error fetching products:', error);
     });
 
+fetch ('http://127.0.0.1:3001/admin/all-category')
+    .then(response => response.json())
+    .then(categories => {
+        addCategory("", categories)
+    })
+    .catch(error => {
+        console.error('Error fetching products:', error);
+    });
+
+
+function getAttributesInCreate(path, des) {
+    if (path["name"] == des) {
+        const keys = Object.keys(path)
+
+        keys.forEach(key => {
+            if (key != "sub_category") {
+                createCateAttrDiv.innerHTML += `<label for="${key}">${key}</label>`
+                createCateAttrDiv.innerHTML += `<input id="category-${key}-input" name="${key}" placeholder="${key}" type="text" required>`
+                updateCateAttrDiv.innerHTML += `<label for="${key}">${key}</label>`
+                updateCateAttrDiv.innerHTML += `<input id="category-${key}-input" name="${key}" placeholder="${key}" type="text" required>`
+            }
+        })
+        return true
+    }
+
+    if (path['sub_category']) {
+        path['sub_category'].forEach(cate => {
+            const result = getAttributesInCreate(cate, des)
+            if (result) {
+                return result;
+            }
+        });
+    }
+    return false
+}
+
+function addCategory(from, category) {
+    for (const cate of category) {
+        var value = from ? `${from}-${cate.name}` : cate.name;
+
+        createSelectedMenu.innerHTML += `<option value="${value}">${cate.name}</option>`;
+        updateSelectedMenu.innerHTML += `<option value="${value}">${cate.name}</option>`;
+        
+        if (cate.sub_category) {
+            addCategory(cate.name, cate.sub_category);
+        }
+    }
+}
 
 function fillInUpdateForm(productId) {
     fetch(`http://127.0.0.1:3001/products/${productId}`)
@@ -69,34 +137,40 @@ function fillInUpdateForm(productId) {
     })
 }
 
-fetch('http://127.0.0.1:3001/products')
-    .then(response => response.json())
-    .then(products => {
-        products.forEach(product => {
-            productList.innerHTML += 
-                `<div data-product-id="${product.id}" class="product-item">
-                    <div class="product-image">
-                        <img src="Assets/${product.image}" alt="${product.title}">
-                    </div>
-                    <h3 class="product-name">${product.title}</h3>
-                    <p class="product-price">${product.price}</p>
-                </div>`;
+updateSelectedMenu.addEventListener("change", function(event) {
+    const value = createSelectedMenu.value
+    const category = value.split("-")
+    updateCateAttrDiv.innerHTML = ""
+
+    fetch (`http://localhost:3001/admin/category/${value}`)
+        .then(response => response.json())
+        .then(attributes => {
+            getAttributesInCreate(attributes, category[category.length-1])
+        })
+        .catch(error => {
+            console.error('Error fetching products:', error);
         });
+});
 
+createSelectedMenu.addEventListener("change", function(event) {
+    const value = createSelectedMenu.value
+    const category = value.split("-")
+    createCateAttrDiv.innerHTML = ""
 
-        const productItems = document.querySelectorAll('.product-item');
-        productItems.forEach(productItem => {
-            productItem.addEventListener('click', async () => {
-                const productId = productItem.getAttribute('data-product-id');
-                fillInUpdateForm(productId);
-            });
+    fetch (`http://localhost:3001/admin/category/${value}`)
+        .then(response => response.json())
+        .then(attributes => {
+            console.log(attributes)
+            if (attributes.hasOwnProperty('name')) {
+                delete attributes.name;
+            }
+            console.log(attributes)
+            getAttributesInCreate(attributes, category[category.length-1])
+        })
+        .catch(error => {
+            console.error('Error fetching products:', error);
         });
-    })
-    .catch(error => {
-        console.error('Error fetching products:', error);
-    });
-
-
+});
 
 document.getElementById("create-image-input").addEventListener("change", function(event) {
     var reader = new FileReader();
@@ -182,12 +256,14 @@ document.getElementById('cancel-button-1').addEventListener('click', () => {
     overlay.style.display = 'none';
     createFormContainer.style.display = 'none';
     updateFormContainer.style.display = 'none';
+    location.reload()
 });
 
 document.getElementById('cancel-button-2').addEventListener('click', () => {
     overlay.style.display = 'none';
     createFormContainer.style.display = 'none';
     updateFormContainer.style.display = 'none';
+    location.reload()
 });
 
 document.getElementById('form-create-button').addEventListener('click', async event => {
@@ -202,6 +278,16 @@ document.getElementById('form-create-button').addEventListener('click', async ev
     
     const imageInput = document.getElementById('create-image-input').files[0];
     formData.append('image', imageInput !== undefined ? imageInput : '');
+
+    const input_tags = document.querySelectorAll("#create-category-attributes input")
+    var attributes = {}
+    for (var i = 0; i < input_tags.length; i++) {
+        const itemKey = input_tags[i].id
+        const itemValue = input_tags[i].value
+        attributes[itemKey.split("-")[1]] = itemValue;
+    }
+
+    formData.append('category_attr', JSON.stringify(attributes));
 
     try {
         const response = await fetch('http://127.0.0.1:3001/products', {
