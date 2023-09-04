@@ -20,6 +20,7 @@ DROP TABLE IF EXISTS customer;
 DROP TABLE IF EXISTS product_order;
 DROP TABLE IF EXISTS warehouse;
 DROP TABLE IF EXISTS warehouse_address;
+DROP TABLE IF EXISTS seller;
 
 -- Drop triggers
 DROP TRIGGER IF EXISTS complete_order_trigger;
@@ -31,7 +32,6 @@ DROP PROCEDURE IF EXISTS reject_order;
 DROP PROCEDURE IF EXISTS insert_product;
 DROP PROCEDURE IF EXISTS move_product;
 DROP PROCEDURE IF EXISTS order_product;
-
 
 -- Create tables
 CREATE TABLE warehouse_address(
@@ -75,9 +75,9 @@ CREATE TABLE product (
     description TEXT,
     price DECIMAL(10,2) NOT NULL,
     category VARCHAR(100) NOT NULL,
-    length DECIMAL(8,2),
-    width DECIMAL(8,2),
-    height DECIMAL(8,2),
+    length DECIMAL(8,2) NOT NULL,
+    width DECIMAL(8,2) NOT NULL,
+    height DECIMAL(8,2) NOT NULL,
     image VARCHAR(255),
     template_id INT,
     wid INT,
@@ -90,6 +90,13 @@ CREATE TABLE customer (
     customer_name VARCHAR(50),
 	PRIMARY KEY(id)
 );
+
+CREATE TABLE seller (
+	id INT auto_increment,
+    seller_name VARCHAR(50),
+	PRIMARY KEY(id)
+);
+
 -- Accept = 1, Reject = 0
 CREATE TABLE product_order (
 	id INT auto_increment,
@@ -101,10 +108,11 @@ CREATE TABLE product_order (
 );
 
 -- Indexing
-
-CREATE INDEX address_index ON warehouse(address_id);
 CREATE INDEX warehouse_index ON product(wid);
 CREATE INDEX order_index ON product(oid);
+CREATE INDEX category_index ON product(category);
+CREATE INDEX customer_product_order_index ON product_order(cid);
+CREATE INDEX product_order_template_index ON product_order(template_id);
 
 -- Transaction
 -- Ensuring total number of products in all warehouses is consistent before and after a move
@@ -401,6 +409,8 @@ DELIMITER ;
 -- Sample Datas
 INSERT INTO customer (customer_name) VALUES ('Customer 1'), ('Customer 2');
 
+INSERT INTO seller (seller_name) VALUES ('Seller 1'), ('Seller 2');
+
 INSERT INTO warehouse_address (province, city, district, street, street_number) values ('Khanh Hoa', 'Nha Trang', 'Vinh Tho', 'Hai Ba Trung', '123');
 INSERT INTO warehouse_address (province, city, district, street, street_number) values ('Sai Gon', 'Ho Chi Minh', 'Quan 1', 'Ly Thai To', '245');
 INSERT INTO warehouse_address (province, city, district, street, street_number) values ('Da Nang', 'Da Nang', 'Da Nang', 'Nguyen Truong To', '789');
@@ -450,5 +460,5 @@ GRANT `admin` TO `lazada_admin`@`localhost`;
 GRANT `seller` TO `lazada_seller`@`localhost`;
 GRANT `customer` TO `lazada_customer`@`localhost`;
 
-show grants for `lazada_customer`@`localhost`;
+-- show grants for `lazada_customer`@`localhost`;
 -- select host, user, plugin, authentication_string from mysql.user;
