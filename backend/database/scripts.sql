@@ -104,7 +104,12 @@ CREATE TABLE product_order (
     template_id INT NOT NULL,
     product_quantity INT,
     order_status INT DEFAULT -1,
-    PRIMARY KEY(id)
+    PRIMARY KEY(id, order_status)
+) ENGINE = InnoDB
+PARTITION BY LIST(order_status) (
+	PARTITION order_accept VALUES IN (1),
+    PARTITION order_reject VALUES IN (0),
+    PARTITION order_waiting VALUES IN (-1)
 );
 
 -- Indexing
