@@ -34,21 +34,9 @@ async function create_product(req, res) {
                 res.status(500).json({ error: 'Error creating product' });
             } else {
                 var collection = client.db('lazada').collection('product_template');
-
                 attributes['pid'] = result.insertId
 
                 collection.insertOne(attributes, async (err, result) => {
-                    if (err) {
-                        console.error('Error inserting document:', err);
-                    } else {
-                        console.log('Inserted document into "product" collection');
-                    }
-                });
-
-                collection = client.db('lazada').collection('product');
-                const data = { pid: result.insertId, category: category }
-
-                collection.insertOne(data, async (err, result) => {
                     if (err) {
                         console.error('Error inserting document:', err);
                     } else {
