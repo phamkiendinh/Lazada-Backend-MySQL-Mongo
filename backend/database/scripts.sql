@@ -14,7 +14,7 @@ DROP ROLE IF EXISTS `seller`;
 DROP ROLE IF EXISTS `customer`;
 
 -- Recreate tables
-DROP TABLES IF EXISTS product;
+DROP TABLE IF EXISTS product;
 DROP TABLE IF EXISTS product_template;
 DROP TABLE IF EXISTS customer;
 DROP TABLE IF EXISTS product_order;
