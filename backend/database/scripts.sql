@@ -1,6 +1,18 @@
 -- CREATE DATABASE lazada;
 USE lazada;
 
+-- These drops are used for fast reseting tables and datas for testing and experimenting purposes
+
+-- DROP Users
+DROP USER IF EXISTS `lazada_admin`@`localhost`;
+DROP USER IF EXISTS `lazada_seller`@`localhost`;
+DROP USER IF EXISTS `lazada_customer`@`localhost`;
+
+-- Drop Roles
+DROP ROLE IF EXISTS `admin`;
+DROP ROLE IF EXISTS `seller`;
+DROP ROLE IF EXISTS `customer`;
+
 -- Recreate tables
 DROP TABLES IF EXISTS product;
 DROP TABLE IF EXISTS product_template;
@@ -40,7 +52,7 @@ CREATE TABLE warehouse (
     current_volume INT NOT NULL,
 	PRIMARY KEY (id),
     FOREIGN KEY (address_id) REFERENCES warehouse_address(id)
-) ENGINE=InnoDB;	
+) ENGINE = InnoDB;
 
 CREATE TABLE product_template(
 	id INT auto_increment,
@@ -62,7 +74,7 @@ CREATE TABLE product (
     title VARCHAR(255) NOT NULL,
     description TEXT,
     price DECIMAL(10,2) NOT NULL,
-    category VARCHAR(100),
+    category VARCHAR(100) NOT NULL,
     length DECIMAL(8,2),
     width DECIMAL(8,2),
     height DECIMAL(8,2),
@@ -70,8 +82,8 @@ CREATE TABLE product (
     template_id INT,
     wid INT,
     oid INT,
-    PRIMARY KEY(id)
-);
+    PRIMARY KEY(id, category)
+) ENGINE = InnoDB;
 
 CREATE TABLE customer (
 	id INT auto_increment,
@@ -374,6 +386,7 @@ CREATE TRIGGER complete_order_trigger
 AFTER UPDATE ON product_order 
 FOR EACH ROW
 BEGIN
+	-- On default order_status is -1
 	IF NEW.order_status = 1 THEN
 		CALL accept_order(NEW.id);
     END IF;
@@ -414,3 +427,28 @@ VALUES ('title 1', 'This is title 1', 10, 'electronic', 5, 5, 5, 'Image 1', 1, 1
 -- CALL order_product(1,1,2); -- Order 2 products from template 1 for customer 1
 -- CALL order_product(2,2,1); -- Order 1 product from template 2 for customer 2
 -- ROLLBACK;
+
+-- Create Users
+CREATE USER `lazada_admin`@`localhost` IDENTIFIED WITH SHA256_PASSWORD BY 'admin';
+CREATE USER `lazada_seller`@`localhost` IDENTIFIED WITH SHA256_PASSWORD BY 'seller';
+CREATE USER `lazada_customer`@`localhost` IDENTIFIED WITH SHA256_PASSWORD BY 'customer';
+
+-- Create Roles
+CREATE ROLE `admin`;
+CREATE ROLE `seller`;
+CREATE ROLE `customer`;
+
+-- Grant privileges to roles
+GRANT ALL PRIVILEGES ON lazada.* to `admin` WITH GRANT OPTION;
+GRANT SELECT, UPDATE, DELETE ON lazada.product to `seller`;
+GRANT SELECT, UPDATE, DELETE ON lazada.product_order to `seller`;
+GRANT SELECT, UPDATE ON lazada.product to `customer`;
+FLUSH PRIVILEGES;
+
+-- Assign roles to accounts
+GRANT `admin` TO `lazada_admin`@`localhost`;
+GRANT `seller` TO `lazada_seller`@`localhost`;
+GRANT `customer` TO `lazada_customer`@`localhost`;
+
+show grants for `lazada_customer`@`localhost`;
+-- select host, user, plugin, authentication_string from mysql.user;
