@@ -19,7 +19,7 @@ async function getAllProduct(req, res) {
 
 async function countProducts(req, res) {
     const templateID = req.params.templateID;
-    const query = `SELECT COUNT(product.id) AS count from product WHERE product.template_id = ?;`;
+    const query = `SELECT COUNT(product.id) AS count from product WHERE product.template_id = ? AND product.wid IS NOT NULL;`;
     db.query(query, [templateID], async (err, response) => {
         if (err) {
             console.log(err);
