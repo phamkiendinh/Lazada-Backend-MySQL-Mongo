@@ -48,6 +48,47 @@ async function getAllTopCategory(req, res) {
     }
 }
 
+async function getAllCategory(req, res) {
+    try {
+        var db = client.db('lazada');
+        var collection = db.collection('category');
+        const data = await collection.find({}, {projection: {_id:0}}).toArray();
+        // console.log(data);
+        if (data.length == 0) {
+            res.send(null);
+        }
+        res.send(data);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+
+async function getCategoryAttributesByPath(req, res) {
+    try {
+        const categoryPath = req.params.path;
+        var db = client.db('lazada');
+        var collection = db.collection('category');
+
+        const pathComponents = categoryPath.split('-');
+
+        let query = { name: pathComponents[0] };
+
+        const result = await collection.findOne(query, {projection: {_id:0}});
+
+        if (result) {
+            res.send(result);
+        } else {
+            res.status(404).send('Category not found.');
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+}
+
+
 async function addTopCategory(req, res) {
     // console.log(req.body);
     let json = req.body;
@@ -325,6 +366,8 @@ module.exports = {
     countProducts,
     getOneAdmin,
     getAllTopCategory,
+    getAllCategory,
+    getCategoryAttributesByPath,
     getTopCategory,
     addTopCategory,
     updateTopCategory,

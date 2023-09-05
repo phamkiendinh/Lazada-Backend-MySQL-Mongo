@@ -4,7 +4,7 @@ const selectedMenu = document.getElementById('order-product');
 const maxWidth = 250;
 const maxHeight = 250;
 
-fetch('http://127.0.0.1:3001/orders/1')
+fetch('http://127.0.0.1:3001/orders')
     .then(response => response.json())
     .then(orders => {
         if (orders.length === 0) {
@@ -54,11 +54,14 @@ document.getElementById('cancel-button-1').addEventListener('click', () => {
     orderFormContainer.style.display = 'none';
 });
 
-document.getElementById('order-product').addEventListener('change', event => {
+
+selectedMenu.addEventListener('change', event => {
     if (event.target.value == 0) {
         document.getElementById('order-product-img').src = ''
     } else {
-        fetch(`http://127.0.0.1:3001/products/${event.target.value}`)
+        const value = selectedMenu.value
+
+        fetch(`http://127.0.0.1:3001/products/${value}`)
             .then(response => response.json())
             .then(product => {
                 const img = new Image();
@@ -95,15 +98,9 @@ document.getElementById('order-product').addEventListener('change', event => {
             .catch(error => {
                 console.error('Error fetching products:', error);
             });
+
     }
 });
-
-const newObject = {
-    pid: 1,
-    uid: 1,
-    quantity: 1,
-    status: "Pending"
-}
 
 document.getElementById('form-order-button').addEventListener('click', async () => {
     const data = {

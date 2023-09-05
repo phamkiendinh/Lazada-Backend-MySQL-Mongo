@@ -6,6 +6,8 @@ const admin_controller = require('../controller/admin_controller');
 
 admin_router.get('/',admin_controller.getOneAdmin);
 admin_router.get('/category/:categoryName/count', admin_controller.countProducts);
+admin_router.get('/all-category', admin_controller.getAllCategory);
+admin_router.get('/category/:path', admin_controller.getCategoryAttributesByPath);
 
 // Top Category
 
