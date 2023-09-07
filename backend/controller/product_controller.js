@@ -3,14 +3,29 @@ const db = require('../database/mySQL.js');
 
 async function getAllProduct(req, res) {
     const json = req.body;
-    const query = `SELECT * from product WHERE product.wid IS NOT NULL`;
+    const query = `SELECT * from product_template`;
     db.query(query, async (err, response) => {
         if (err) {
             console.log(err);
             res.send({status:400});
         }
         else {
-            console.log(response);
+            // console.log(response);
+            res.send(response);
+            return;
+        }
+    });
+}
+
+async function getAllProductCategory(req,res) {
+    const query = `SELECT DISTINCT category from product_template`;
+    db.query(query, async (err, response) => {
+        if (err) {
+            console.log(err);
+            res.send({status:400});
+        }
+        else {
+            // console.log(response);
             res.send(response);
             return;
         }
@@ -19,7 +34,10 @@ async function getAllProduct(req, res) {
 
 async function countProducts(req, res) {
     const templateID = req.params.templateID;
-    const query = `SELECT COUNT(product.id) AS count from product WHERE product.template_id = ? AND product.wid IS NOT NULL;`;
+    const query = `
+    SELECT COUNT(product.id) AS count 
+    from product 
+    WHERE product.template_id = ? AND product.wid IS NOT NULL AND product.oid IS NULL;`;
     db.query(query, [templateID], async (err, response) => {
         if (err) {
             console.log(err);
@@ -27,7 +45,7 @@ async function countProducts(req, res) {
             res.send({status:400});
         }
         else {
-            console.log(response);
+            // console.log(response);
             res.send(response);
             return;
         }
@@ -38,7 +56,7 @@ async function orderProduct(req, res) {
     const product_template_id = req.body.product_template_id;
     const customer_id = req.body.customer_id;
     const product_quantity = req.body.product_quantity;
-
+    console.log(req.body);
 
     const query = `CALL order_product(?,?,?)`;
     db.query(query,[product_template_id, customer_id, product_quantity], async (err, response) => {
@@ -52,12 +70,14 @@ async function orderProduct(req, res) {
             return;
         }
     });
+    // res.send({status: 200});
 }
 
 async function finishOrder(req, res) {
     const order_status = req.body.order_status;
     const product_order_id = req.body.product_order_id;
 
+    // console.log(req.body);
     const query = `
         UPDATE product_order
         SET product_order.order_status = ?
@@ -77,8 +97,7 @@ async function finishOrder(req, res) {
         }
     });
 
-    
-    
+    // res.json({status: 200});
 }
 
 async function cleanOrder() {
@@ -105,6 +124,7 @@ module.exports = {
     getAllProduct,
     countProducts,
     orderProduct,
-    finishOrder
+    finishOrder,
+    getAllProductCategory
 }
 

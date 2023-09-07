@@ -1,11 +1,15 @@
-import { useLoaderData, Link} from 'react-router-dom';
+import { useLoaderData, Link, useNavigate} from 'react-router-dom';
 
 function Admin() {
+    const navigate = useNavigate();
     const data = useLoaderData();
     if (data === null || data === undefined) {
         return (
             <div className='row'>
                 <div className='col-2 left-panel bg-dark mt-5'>
+                    <button className="btn btn-primary w-100 m-1" onClick={() => navigate(-1)}>
+                        Go Back
+                    </button>
                     <button className="btn btn-primary w-100 m-1">
                         <Link to="category" className="text text-white">Category Management</Link>
                     </button>
@@ -27,6 +31,9 @@ function Admin() {
     return (
         <div className='row'>
             <div className='col-2 left-panel bg-dark mt-5'>
+                <button className="btn btn-primary w-100 m-1" onClick={() => navigate(-1)}>
+                    Go Back
+                </button>
                 <button className="btn btn-primary w-100 m-1">
                     <Link to="category" className="text text-white">Category Management</Link>
                 </button>
