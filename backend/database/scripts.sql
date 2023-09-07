@@ -433,11 +433,10 @@ VALUES ('title 1', 'This is title 1', 10, 'electronic', 5, 5, 5, 'Image 1', NULL
 
 
 INSERT INTO product (title, description, price, category, length, width, height, image, template_id, wid)
-VALUES ('title 1', 'This is title 1', 10, 'electronic', 5, 5, 5, 'Image 1', 1, 1),
-	   ('title 2', 'This is title 2', 20, 'furniture', 10, 10, 10, 'Image 2', 2, 2),
-       ('title 3', 'This is title 3', 30, 'phone', 20, 20, 20, 'Image 3', 3, 3),
-	   ('title 4', 'This is title 4', 40, 'chair', 5, 5, 5, 'Image 4', 4, NULL),
-	   ('title 5', 'This is title 5', 50, 'electronic', 5, 5, 5, 'Image 1', 1, 1);
+VALUES ('title 1', 'This is title 1 book', 10, 'electronic', 5, 5, 5, 'Image 1', 1, 1),
+	   ('title 2', 'This is title 2 book', 20, 'furniture', 10, 10, 10, 'Image 2', 2, 2),
+       ('title 3', 'This is title 3 song', 30, 'phone', 20, 20, 20, 'Image 3', 3, 3),
+	   ('title 4', 'This is title 4 pet', 40, 'chair', 5, 5, 5, 'Image 4', 4, NULL);
 
 -- CALL order_product(1,1,2); -- Order 2 products from template 1 for customer 1
 -- CALL order_product(2,2,1); -- Order 1 product from template 2 for customer 2

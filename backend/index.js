@@ -24,8 +24,10 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use('/admin', admin_router);
 app.use('/admin/warehouse', warehouse_router);
 
+// Customer
 app.use('/product', product_router);
 
+// Seller
 app.use('/products', products_router)
 app.use('/orders', orders_router)
 

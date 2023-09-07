@@ -11,6 +11,9 @@ import { loadAdmin } from "../pages/Admin";
 import { loadAllSubCategory } from "../components/AdminCategory/SubCategory";
 import { loadAllTopCategory } from "../components/AdminCategory/TopCategory";
 import { loadTopCategory } from "../components/AdminCategory/UpdateTopCategory";
+import { loadCustomerProducts } from "../components/Customer/Products";
+
+
 //Component
 import TopCategory from "../components/AdminCategory/TopCategory";
 import TopCategoryDetail from "../components/AdminCategory/TopCategoryDetail";
@@ -33,7 +36,19 @@ import { loadWareHouse } from "../components/AdminWareHouse/UpdateWareHouse";
 import UpdateTopCategory from "../components/AdminCategory/UpdateTopCategory";
 import UpdateSubCategory, {loadSubCategory} from "../components/AdminCategory/UpdateSubCategory";
 import ViewWaitProducts, { loadWaitProducts } from "../components/AdminWareHouse/ViewWaitProducts";
+import Products from "../components/Customer/Products";
+import Cart from "../components/Customer/Cart";
+import Homepage from "../pages/Homepage";
+import Customer from "../pages/Customer";
 export const routes = createBrowserRouter([
+    {
+        path: '/',
+        element: <Homepage />
+    },
+    {
+        path: '*',
+        element: <Error />
+    },    
     {
         path : '/admin',
         element : <Admin />,
@@ -117,4 +132,20 @@ export const routes = createBrowserRouter([
         loader: loadWaitProducts,
         error : <Error />
     },
+    {
+        path: '/customer',
+        element: <Customer />,
+        error: <Error />
+    },
+    {
+        path: '/customer/:customerID',
+        element: <Products />,
+        loader: loadCustomerProducts,
+        error: <Error />
+    },
+    {
+        path: '/customer/:customerID/cart',
+        element: <Cart />,
+        error: <Error />
+    }
 ]);
