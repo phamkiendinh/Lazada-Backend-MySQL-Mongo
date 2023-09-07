@@ -24,10 +24,9 @@ fetch('http://127.0.0.1:3001/products')
                         <img src="Assets/${product.image}" alt="${product.title}">
                     </div>
                     <h3 class="product-name">${product.title}</h3>
-                    <p class="product-price">${product.price}</p>
+                    <p class="product-quantity">Quantity: <span>${product.quantity}</span></p>
                 </div>`;
         });
-
 
         const productItems = document.querySelectorAll('.product-item');
         productItems.forEach(productItem => {
@@ -56,11 +55,9 @@ function getAttributesInCreate(path, des) {
         const keys = Object.keys(path)
 
         keys.forEach(key => {
-            if (key != "sub_category") {
+            if (key != "sub_category" && key != "name") {
                 createCateAttrDiv.innerHTML += `<label for="${key}">${key}</label>`
-                createCateAttrDiv.innerHTML += `<input id="category-${key}-input" name="${key}" placeholder="${key}" type="text" required>`
-                updateCateAttrDiv.innerHTML += `<label for="${key}">${key}</label>`
-                updateCateAttrDiv.innerHTML += `<input id="category-${key}-input" name="${key}" placeholder="${key}" type="text" required>`
+                createCateAttrDiv.innerHTML += `<input id="create-category-${key}-input" name="${key}" placeholder="${key}" type="${path[key].type}" ${path[key].type == "number" ? 'value="0" min="0"' : "" } ${path[key].required ? "required" : "" }>`
             }
         })
         return true
@@ -69,6 +66,30 @@ function getAttributesInCreate(path, des) {
     if (path['sub_category']) {
         path['sub_category'].forEach(cate => {
             const result = getAttributesInCreate(cate, des)
+            if (result) {
+                return result;
+            }
+        });
+    }
+    return false
+}
+
+function getAttributesInUpdate(path, des) {
+    if (path["name"] == des) {
+        const keys = Object.keys(path)
+
+        keys.forEach(key => {
+            if (key != "sub_category" && key != "name") {
+                updateCateAttrDiv.innerHTML += `<label for="${key}">${key}</label>`
+                updateCateAttrDiv.innerHTML += `<input id="update-category-${key}-input" name="${key}" placeholder="${key}" type="${path[key].type}" ${path[key].type == "number" ? 'value="0" min="0"' : "" } ${path[key].required ? "required" : "" }>`
+            }
+        })
+        return true
+    }
+
+    if (path['sub_category']) {
+        path['sub_category'].forEach(cate => {
+            const result = getAttributesInUpdate(cate, des)
             if (result) {
                 return result;
             }
@@ -103,6 +124,34 @@ function fillInUpdateForm(productId) {
             document.getElementById('update-width-input').value = product.width;
             document.getElementById('update-height-input').value = product.height;
 
+            const quantity = parseInt(document.querySelector(`div[data-product-id="${productId}"] .product-quantity span`).textContent);
+            const deleteButton = document.getElementById('form-delete-button');
+            const updateButton = document.getElementById('form-update-button');
+            if (quantity > 0) {
+                deleteButton.disabled = true;
+                updateButton.disabled = true;
+
+                deleteButton.style.backgroundColor = 'lightgray';
+                deleteButton.style.color = 'gray';
+                deleteButton.style.cursor = 'not-allowed';
+
+                updateButton.style.backgroundColor = 'lightgray';
+                updateButton.style.color = 'gray';
+                updateButton.style.cursor = 'not-allowed';
+            } else {
+                deleteButton.disabled = false;
+                updateButton.disabled = false;
+
+                deleteButton.style.backgroundColor = 'red';
+                deleteButton.style.color = 'white';
+                deleteButton.style.cursor = 'pointer';
+
+                updateButton.style.backgroundColor = '#007bff';
+                updateButton.style.color = 'white';
+                updateButton.style.cursor = '';
+            }
+
+
             const img = new Image();
             img.src = `Assets/${product.image}`;
 
@@ -131,21 +180,50 @@ function fillInUpdateForm(productId) {
                 updateImageTag.style.width = newWidth + "px";
                 updateImageTag.style.height = newHeight + "px";
             };
-            overlay.style.display = 'block';
-            createFormContainer.style.display = 'none';
-            updateFormContainer.style.display = 'block';
-    })
+
+            const value = product.category
+            const category = value.split("-")
+            updateCateAttrDiv.innerHTML = ""
+
+            fetch (`http://localhost:3001/admin/category/${value}`)
+                .then(response => response.json())
+                .then(attributes => {
+                    getAttributesInUpdate(attributes, category[category.length-1])
+                    
+                    fetch (`http://localhost:3001/products/category/${productId}`)
+                        .then(response => response.json())
+                        .then(attributes => {
+                            const keys = Object.keys(attributes)
+                            keys.forEach(key => {
+                                document.getElementById(`update-category-${key}-input`).value = attributes[key] ? attributes[key] : ""
+                            })
+                        })
+                        .catch(error => {
+                            console.error('Error fetching products:', error);
+                        });
+                
+                })
+                .catch(error => {
+                    console.error('Error fetching products:', error);
+                });
+        });
+
+    
+
+    overlay.style.display = 'block';
+    createFormContainer.style.display = 'none';
+    updateFormContainer.style.display = 'block';
 }
 
 updateSelectedMenu.addEventListener("change", function(event) {
-    const value = createSelectedMenu.value
+    const value = updateSelectedMenu.value
     const category = value.split("-")
     updateCateAttrDiv.innerHTML = ""
 
     fetch (`http://localhost:3001/admin/category/${value}`)
         .then(response => response.json())
         .then(attributes => {
-            getAttributesInCreate(attributes, category[category.length-1])
+            getAttributesInUpdate(attributes, category[category.length-1])
         })
         .catch(error => {
             console.error('Error fetching products:', error);
@@ -154,17 +232,18 @@ updateSelectedMenu.addEventListener("change", function(event) {
 
 createSelectedMenu.addEventListener("change", function(event) {
     const value = createSelectedMenu.value
-    const category = value.split("-")
     createCateAttrDiv.innerHTML = ""
+
+    if (value == "none") {
+        return
+    }
+
+    const category = value.split("-")
+    
 
     fetch (`http://localhost:3001/admin/category/${value}`)
         .then(response => response.json())
         .then(attributes => {
-            console.log(attributes)
-            if (attributes.hasOwnProperty('name')) {
-                delete attributes.name;
-            }
-            console.log(attributes)
             getAttributesInCreate(attributes, category[category.length-1])
         })
         .catch(error => {
@@ -284,7 +363,7 @@ document.getElementById('form-create-button').addEventListener('click', async ev
     for (var i = 0; i < input_tags.length; i++) {
         const itemKey = input_tags[i].id
         const itemValue = input_tags[i].value
-        attributes[itemKey.split("-")[1]] = itemValue;
+        attributes[itemKey.split("-")[2]] = itemValue;
     }
 
     formData.append('category_attr', JSON.stringify(attributes));
@@ -362,4 +441,43 @@ document.getElementById('form-update-button').addEventListener('click', async ()
     } catch (error) {
         console.error('Error updating product:', error);
     }
+});
+
+document.getElementById('form-order-button').addEventListener('click', async () => {
+    
+    var quantity = prompt('Enter the quantity:', '1');
+
+    if (quantity === null) {
+        alert('Invalid Input');
+        return
+    }
+
+    const volume = parseInt(document.getElementById('update-length-input').value) * 
+                   parseInt(document.getElementById('update-width-input').value) *
+                   parseInt(document.getElementById('update-height-input').value);
+
+    const data = {
+        'pid': parseInt(document.getElementById('update-id').textContent),
+        'quantity': parseInt(quantity),
+        'volume': parseInt(volume)
+    }
+
+    try {
+        const response = await fetch('http://127.0.0.1:3001/orders/insert_orders', {
+            method: 'POST',
+            headers:{'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            alert(`Order created!`);
+            location.reload();
+        } else {
+            console.error('Failed to create product');
+        }
+    } catch (error) {
+        console.error('Error creating product:', error);
+    }
+    overlay.style.display = 'none';
 });

@@ -1,9 +1,9 @@
 const db = require('../database/mySQL.js')
-
+const async = require('async');
 async function create_order(req, res) {
-    const { pid, quantity, status } = req.body;
-    const query = `INSERT INTO product_order (pid, quantity, status) VALUES (?, ?, ?);`;
-    const values = [ pid, quantity, status ];
+    const { pid, quantity } = req.body;
+    const query = `INSERT INTO product_order (template_id, product_quantity) VALUES (?, ?);`;
+    const values = [ pid, quantity ];
 
     db.query(query, values, async (err, result) => {
         if (err) {
@@ -28,7 +28,34 @@ async function get_all_orders(req, res) {
     });
 }
 
+async function insert_inbounded_orders(req, res) {
+    const { pid, quantity, volume } = req.body;
+    const query = `CALL insert_product (?, ?);`;
+    const values = [ pid, volume ];
+
+    async.eachSeries(
+        Array.from({ length: quantity }, (_, i) => i),
+        (i, callback) => {
+            db.query(query, values, (err, result) => {
+                if (err) {
+                    callback(err);
+                } else {
+                    callback();
+                }
+            });
+        },
+        (err) => {
+            if (err) {
+                res.status(500).json({ error: 'Error creating order' });
+            } else {
+                res.status(200).json({ message: 'Order created successfully' });
+            }
+        }
+    );
+}
+
 module.exports = {
     create_order, 
-    get_all_orders
+    get_all_orders, 
+    insert_inbounded_orders
 }

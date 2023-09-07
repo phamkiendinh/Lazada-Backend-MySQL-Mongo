@@ -24,4 +24,6 @@ products_router.put('/:id', upload.single('image'), products_controller.update_p
 products_router.delete('/:id', products_controller.delete_product)
 products_router.get('/:id', products_controller.get_product)
 
+products_router.get('/category/:id', products_controller.get_category_attributes)
+
 module.exports = products_router;

@@ -11,6 +11,11 @@ body {
   width: 1000px;
 }
 
+.order-button {
+  background-color: #00cc00;
+  color: #ffffff;
+}
+
 h3 {
   margin-bottom: 0px;
   padding: 0px;
@@ -95,16 +100,6 @@ label, input, textarea, select {
   color: #ffffff;
 }
 
-.update-button {
-  background-color: #007bff;
-  color: #ffffff;
-}
-
-.delete-button {
-  background-color: red;
-  color: #ffffff;
-}
-
 .button-container {
   display: flex;
   justify-content: flex-end;
@@ -115,12 +110,17 @@ label, input, textarea, select {
 #cancel-button-2,
 #form-create-button,
 #form-delete-button,
-#form-update-button {
+#form-update-button,
+#form-order-button {
   padding: 8px 20px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   margin-left: 10px;
+}
+
+button:hover {
+  opacity: 0.8;
 }
 
 #product-list {
