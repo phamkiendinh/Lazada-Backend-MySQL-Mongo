@@ -257,7 +257,7 @@ BEGIN
         WHERE warehouse.id = `warehouseID`;
     END IF;
     
-    SELECT `new_volume`, `new_product_id`, `warehouseID`;
+    SELECT new_volume, new_product_id, warehouseID;
 END $$
 DELIMITER ;
 
@@ -326,7 +326,7 @@ BEGIN
 		COMMIT;
 	END IF;
     
-    SELECT `new_product_order_id`, `_rollback`, `available_quantity`, `product_quantity`, `customer_id`, `product_template_id`;
+    SELECT new_product_order_id, _rollback, available_quantity, product_quantity, customer_id, product_template_id;
     -- WHILE quantity
 END $$
 DELIMITER ;
@@ -426,17 +426,20 @@ INSERT INTO warehouse (address_id, warehouse_name, volume, current_volume) value
 
 
 INSERT INTO product_template (title, description, price, category, length, width, height, image, wid, oid)
-VALUES ('title 1', 'This is title 1', 10, 'electronic', 5, 5, 5, 'Image 1', NULL, NULL),
-	   ('title 2', 'This is title 2', 20, 'furniture', 10, 10, 10, 'Image 2', NULL, NULL),
-       ('title 3', 'This is title 3', 30, 'phone', 20, 20, 20, 'Image 3', NULL, NULL),
-	   ('title 4', 'This is title 4', 40, 'chair', 40, 40, 40, 'Image 4', NULL, NULL);
+VALUES ('title 1', 'This is title 1', 10.10, 'electronic', 5, 5, 5, 'Image 1', NULL, NULL),
+	   ('title 2', 'This is title 2', 20.20, 'furniture', 10, 10, 10, 'Image 2', NULL, NULL),
+       ('title 3', 'This is title 3', 30.30, 'phone', 20, 20, 20, 'Image 3', NULL, NULL),
+	   ('title 4', 'This is title 4', 40.40, 'chair', 40, 40, 40, 'Image 4', NULL, NULL);
 
 
 INSERT INTO product (title, description, price, category, length, width, height, image, template_id, wid)
-VALUES ('title 1', 'This is title 1 book', 10, 'electronic', 5, 5, 5, 'Image 1', 1, 1),
-	   ('title 2', 'This is title 2 book', 20, 'furniture', 10, 10, 10, 'Image 2', 2, 2),
-       ('title 3', 'This is title 3 song', 30, 'phone', 20, 20, 20, 'Image 3', 3, 3),
-	   ('title 4', 'This is title 4 pet', 40, 'chair', 5, 5, 5, 'Image 4', 4, NULL);
+VALUES ('title 1', 'This is title 1 book', 10.10, 'electronic', 5, 5, 5, 'Image 1', 1, 1),
+	   ('title 2', 'This is title 2 book', 20.20, 'furniture', 10, 10, 10, 'Image 2', 2, 2),
+       ('title 3', 'This is title 3 song', 30.30, 'phone', 20, 20, 20, 'Image 3', 3, 3),
+	   ('title 4', 'This is title 4 pet', 40.40, 'chair', 5, 5, 5, 'Image 4', 4, NULL),
+       ('title 1 second', 'This is title 1 book', 10.10, 'electronic', 5, 5, 5, 'Image 1', 1, 1);
+       
+
 
 -- CALL order_product(1,1,2); -- Order 2 products from template 1 for customer 1
 -- CALL order_product(2,2,1); -- Order 1 product from template 2 for customer 2
