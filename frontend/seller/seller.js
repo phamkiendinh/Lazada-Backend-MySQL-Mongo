@@ -124,34 +124,6 @@ function fillInUpdateForm(productId) {
             document.getElementById('update-width-input').value = product.width;
             document.getElementById('update-height-input').value = product.height;
 
-            const quantity = parseInt(document.querySelector(`div[data-product-id="${productId}"] .product-quantity span`).textContent);
-            const deleteButton = document.getElementById('form-delete-button');
-            const updateButton = document.getElementById('form-update-button');
-            if (quantity > 0) {
-                deleteButton.disabled = true;
-                updateButton.disabled = true;
-
-                deleteButton.style.backgroundColor = 'lightgray';
-                deleteButton.style.color = 'gray';
-                deleteButton.style.cursor = 'not-allowed';
-
-                updateButton.style.backgroundColor = 'lightgray';
-                updateButton.style.color = 'gray';
-                updateButton.style.cursor = 'not-allowed';
-            } else {
-                deleteButton.disabled = false;
-                updateButton.disabled = false;
-
-                deleteButton.style.backgroundColor = 'red';
-                deleteButton.style.color = 'white';
-                deleteButton.style.cursor = 'pointer';
-
-                updateButton.style.backgroundColor = '#007bff';
-                updateButton.style.color = 'white';
-                updateButton.style.cursor = '';
-            }
-
-
             const img = new Image();
             img.src = `Assets/${product.image}`;
 
@@ -389,19 +361,36 @@ document.getElementById('form-create-button').addEventListener('click', async ev
     overlay.style.display = 'none';
 });
 
-document.getElementById('form-delete-button').addEventListener('click', async () => {
+document.getElementById('form-delete-button').addEventListener('click', async (event) => {
     const productID = document.getElementById('update-id').textContent
 
     try {
-        const response = await fetch(`http://127.0.0.1:3001/products/${productID}`, {method: 'DELETE'});
 
-        if (response.ok) {
-            const responseData = await response.json();
-            alert('Product deleted');
-            location.reload();
-        } else {
-            console.error('Failed to create product');
+        const result = await fetch(`http://127.0.0.1:3001/product/${productID}/count`)
+            .then(response => response.json())
+            .then(data => {return data})
+            .catch(error => {
+                console.error('Error fetching products:', error);
+            });
+
+        if (result[0].count !== 0) {
+            alert("Cannot delete the template if there are products")
+            return
         }
+
+        const response = await fetch(`http://127.0.0.1:3001/products/${productID}`, {method: 'DELETE'});
+        console.log(response)
+
+
+            if (response.ok) {
+                const responseData = await response.json();
+                alert('Product deleted');
+                location.reload();
+            } else {
+                console.error('Failed to create product');
+            }
+        
+        
     } catch (error) {
         console.error('Error creating product:', error);
     }
@@ -412,6 +401,18 @@ document.getElementById('form-delete-button').addEventListener('click', async ()
 
 document.getElementById('form-update-button').addEventListener('click', async () => {
     const productID = document.getElementById('update-id').textContent
+
+    const result = await fetch(`http://127.0.0.1:3001/product/${productID}/count`)
+        .then(response => response.json())
+        .then(data => {return data})
+        .catch(error => {
+            console.error('Error fetching products:', error);
+        });
+
+    if (result[0].count !== 0) {
+        alert("Cannot update the template if there are products")
+        return
+    }
 
     const formData = new FormData()
     formData.append('title', document.getElementById('update-title-input').value);

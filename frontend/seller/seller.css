@@ -106,6 +106,16 @@ label, input, textarea, select {
   margin-top: 10px;
 }
 
+.delete-button {
+  background-color: red;
+  color: white
+}
+
+.update-button {
+  background-color: blue;
+  color: white;
+}
+
 #cancel-button-1,
 #cancel-button-2,
 #form-create-button,

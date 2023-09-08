@@ -56,7 +56,6 @@ async function update_product(req, res) {
     const productId = req.params.id;
     const { title, description, price, category, length, width, height } = req.body;
 
-    // Check if a new image is provided
     const newImage = req.file ? req.file.filename : undefined;
 
     const query = `
