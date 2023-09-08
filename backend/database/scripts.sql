@@ -426,18 +426,18 @@ INSERT INTO warehouse (address_id, warehouse_name, volume, current_volume) value
 
 
 INSERT INTO product_template (title, description, price, category, length, width, height, image, wid, oid)
-VALUES ('title 1', 'This is title 1', 10.10, 'electronic', 5, 5, 5, 'Image 1', NULL, NULL),
-	   ('title 2', 'This is title 2', 20.20, 'furniture', 10, 10, 10, 'Image 2', NULL, NULL),
-       ('title 3', 'This is title 3', 30.30, 'phone', 20, 20, 20, 'Image 3', NULL, NULL),
-	   ('title 4', 'This is title 4', 40.40, 'chair', 40, 40, 40, 'Image 4', NULL, NULL);
+VALUES ('title 1', 'This is title 1', 10.10, 'electronic', 5, 5, 5, 'thumbnail.png', NULL, NULL),
+	   ('title 2', 'This is title 2', 20.20, 'furniture', 10, 10, 10, 'thumbnail.png', NULL, NULL),
+       ('title 3', 'This is title 3', 30.30, 'phone', 20, 20, 20, 'thumbnail.png', NULL, NULL),
+	   ('title 4', 'This is title 4', 40.40, 'chair', 40, 40, 40, 'thumbnail.png', NULL, NULL);
 
 
 INSERT INTO product (title, description, price, category, length, width, height, image, template_id, wid)
-VALUES ('title 1', 'This is title 1 book', 10.10, 'electronic', 5, 5, 5, 'Image 1', 1, 1),
-	   ('title 2', 'This is title 2 book', 20.20, 'furniture', 10, 10, 10, 'Image 2', 2, 2),
-       ('title 3', 'This is title 3 song', 30.30, 'phone', 20, 20, 20, 'Image 3', 3, 3),
-	   ('title 4', 'This is title 4 pet', 40.40, 'chair', 5, 5, 5, 'Image 4', 4, NULL),
-       ('title 1 second', 'This is title 1 book', 10.10, 'electronic', 5, 5, 5, 'Image 1', 1, 1);
+VALUES ('title 1', 'This is title 1 book', 10.10, 'electronic', 5, 5, 5, 'thumbnail.png', 1, 1),
+	   ('title 2', 'This is title 2 book', 20.20, 'furniture', 10, 10, 10, 'thumbnail.png', 2, 2),
+       ('title 3', 'This is title 3 song', 30.30, 'phone', 20, 20, 20, 'thumbnail.png', 3, 3),
+	   ('title 4', 'This is title 4 pet', 40.40, 'chair', 5, 5, 5, 'thumbnail.png', 4, NULL),
+       ('title 1 second', 'This is title 1 book', 10.10, 'electronic', 5, 5, 5, 'thumbnail.png', 1, 1);
        
 
 
