@@ -205,11 +205,6 @@ updateSelectedMenu.addEventListener("change", function(event) {
 createSelectedMenu.addEventListener("change", function(event) {
     const value = createSelectedMenu.value
     createCateAttrDiv.innerHTML = ""
-
-    if (value == "none") {
-        return
-    }
-
     const category = value.split("-")
     
 
@@ -301,6 +296,19 @@ document.getElementById('create-button').addEventListener('click', () => {
     overlay.style.display = 'block';
     createFormContainer.style.display = 'block';
     updateFormContainer.style.display = 'none';
+
+    const value = createSelectedMenu.value
+    createCateAttrDiv.innerHTML = ""
+    const category = value.split("-")
+
+    fetch (`http://localhost:3001/admin/category/${value}`)
+        .then(response => response.json())
+        .then(attributes => {
+            getAttributesInCreate(attributes, category[category.length-1])
+        })
+        .catch(error => {
+            console.error('Error fetching products:', error);
+        });
 });
 
 document.getElementById('cancel-button-1').addEventListener('click', () => {
@@ -318,16 +326,60 @@ document.getElementById('cancel-button-2').addEventListener('click', () => {
 });
 
 document.getElementById('form-create-button').addEventListener('click', async event => {
-    const formData = new FormData()
-    formData.append('title', document.getElementById('create-title-input').value);
-    formData.append('description', document.getElementById('create-description-input').value);
-    formData.append('category', document.getElementById('create-category').value);
-    formData.append('price', parseFloat(document.getElementById('create-price-input').value));
-    formData.append('length', parseFloat(document.getElementById('create-length-input').value));
-    formData.append('width', parseFloat(document.getElementById('create-width-input').value));
-    formData.append('height', parseFloat(document.getElementById('create-height-input').value));
-    
+    const title = document.getElementById('create-title-input').value;
+    const description = document.getElementById('create-description-input').value;
+    const category = document.getElementById('create-category').value;
+    const price = parseFloat(document.getElementById('create-price-input').value);
+    const length = parseFloat(document.getElementById('create-length-input').value);
+    const width = parseFloat(document.getElementById('create-width-input').value);
+    const height = parseFloat(document.getElementById('create-height-input').value);
     const imageInput = document.getElementById('create-image-input').files[0];
+    
+    if (title === "") {
+        alert("Invalid Input! Product should have title!")
+        return
+    }
+
+    if (description === "") {
+        alert("Invalid Input! Product should have description!")
+        return
+    }
+
+    if (category === "") {
+        alert("Invalid Input! Product should have category!")
+        return
+    }
+
+    if (price <= 0) {
+        alert("Invalid Input! Product should have price!")
+        return
+    }
+
+    if (length <= 0) {
+        alert("Invalid Input! Product should have length!")
+        return
+    }
+
+    if (width <= 0) {
+        alert("Invalid Input! Product should have width!")
+        return
+    }
+
+    if (height <= 0) {
+        alert("Invalid Input! Product should have height!")
+        return
+    }
+
+    const formData = new FormData()
+    formData.append('title', title);
+    formData.append('description', description);
+    formData.append('category', category);
+    formData.append('price', price);
+    formData.append('length', length);
+    formData.append('width', width);
+    formData.append('height', height);
+    
+    
     formData.append('image', imageInput !== undefined ? imageInput : '');
 
     const input_tags = document.querySelectorAll("#create-category-attributes input")
@@ -365,7 +417,6 @@ document.getElementById('form-delete-button').addEventListener('click', async (e
     const productID = document.getElementById('update-id').textContent
 
     try {
-
         const result = await fetch(`http://127.0.0.1:3001/product/${productID}/count`)
             .then(response => response.json())
             .then(data => {return data})
@@ -414,16 +465,59 @@ document.getElementById('form-update-button').addEventListener('click', async ()
         return
     }
 
-    const formData = new FormData()
-    formData.append('title', document.getElementById('update-title-input').value);
-    formData.append('description', document.getElementById('update-description-input').value);
-    formData.append('category', document.getElementById('update-category').value);
-    formData.append('price', parseFloat(document.getElementById('update-price-input').value));
-    formData.append('length', parseFloat(document.getElementById('update-length-input').value));
-    formData.append('width', parseFloat(document.getElementById('update-width-input').value));
-    formData.append('height', parseFloat(document.getElementById('update-height-input').value));
-
+    const title = document.getElementById('update-title-input').value;
+    const description = document.getElementById('update-description-input').value;
+    const category = document.getElementById('update-category').value;
+    const price = parseFloat(document.getElementById('update-price-input').value);
+    const length = parseFloat(document.getElementById('update-length-input').value);
+    const width = parseFloat(document.getElementById('update-width-input').value);
+    const height = parseFloat(document.getElementById('update-height-input').value);
     const imageInput = document.getElementById('update-image-input').files[0];
+    
+    if (title === "") {
+        alert("Invalid Input! Product should have title!")
+        return
+    }
+
+    if (description === "") {
+        alert("Invalid Input! Product should have description!")
+        return
+    }
+
+    if (category === "") {
+        alert("Invalid Input! Product should have category!")
+        return
+    }
+
+    if (price <= 0) {
+        alert("Invalid Input! Product should have price!")
+        return
+    }
+
+    if (length <= 0) {
+        alert("Invalid Input! Product should have length!")
+        return
+    }
+
+    if (width <= 0) {
+        alert("Invalid Input! Product should have width!")
+        return
+    }
+
+    if (height <= 0) {
+        alert("Invalid Input! Product should have height!")
+        return
+    }
+
+    const formData = new FormData()
+    formData.append('title', title);
+    formData.append('description', description);
+    formData.append('category', category);
+    formData.append('price', price);
+    formData.append('length', length);
+    formData.append('width', width);
+    formData.append('height', height);
+
     formData.append('image', imageInput !== undefined ? imageInput : '');
 
     try {

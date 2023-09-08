@@ -420,24 +420,24 @@ INSERT INTO warehouse_address (province, city, district, street, street_number) 
 INSERT INTO warehouse_address (province, city, district, street, street_number) values ('Sai Gon', 'Ho Chi Minh', 'Quan 1', 'Ly Thai To', '245');
 INSERT INTO warehouse_address (province, city, district, street, street_number) values ('Da Nang', 'Da Nang', 'Da Nang', 'Nguyen Truong To', '789');
 
-INSERT INTO warehouse (address_id, warehouse_name, volume, current_volume) values (1, "Nha Trang ABC", 10000, 250);
-INSERT INTO warehouse (address_id, warehouse_name, volume, current_volume) values (2, "Saigon Tiger", 10000, 1000);
-INSERT INTO warehouse (address_id, warehouse_name, volume, current_volume) values (3, "Da Nang Coop", 10000, 8000);
+INSERT INTO warehouse (address_id, warehouse_name, volume, current_volume) values (1, "Nha Trang ABC", 10000, 0);
+INSERT INTO warehouse (address_id, warehouse_name, volume, current_volume) values (2, "Saigon Tiger", 10000, 0);
+INSERT INTO warehouse (address_id, warehouse_name, volume, current_volume) values (3, "Da Nang Coop", 10000, 0);
 
 
-INSERT INTO product_template (title, description, price, category, length, width, height, image, wid, oid)
-VALUES ('title 1', 'This is title 1', 10.10, 'electronic', 5, 5, 5, 'thumbnail.png', NULL, NULL),
-	   ('title 2', 'This is title 2', 20.20, 'furniture', 10, 10, 10, 'thumbnail.png', NULL, NULL),
-       ('title 3', 'This is title 3', 30.30, 'phone', 20, 20, 20, 'thumbnail.png', NULL, NULL),
-	   ('title 4', 'This is title 4', 40.40, 'chair', 40, 40, 40, 'thumbnail.png', NULL, NULL);
+-- INSERT INTO product_template (title, description, price, category, length, width, height, image, wid, oid)
+-- VALUES ('title 1', 'This is title 1', 10.10, 'electronic', 5, 5, 5, 'thumbnail.png', NULL, NULL),
+-- 	   ('title 2', 'This is title 2', 20.20, 'furniture', 10, 10, 10, 'thumbnail.png', NULL, NULL),
+--        ('title 3', 'This is title 3', 30.30, 'phone', 20, 20, 20, 'thumbnail.png', NULL, NULL),
+-- 	   ('title 4', 'This is title 4', 40.40, 'chair', 40, 40, 40, 'thumbnail.png', NULL, NULL);
 
 
-INSERT INTO product (title, description, price, category, length, width, height, image, template_id, wid)
-VALUES ('title 1', 'This is title 1 book', 10.10, 'electronic', 5, 5, 5, 'thumbnail.png', 1, 1),
-	   ('title 2', 'This is title 2 book', 20.20, 'furniture', 10, 10, 10, 'thumbnail.png', 2, 2),
-       ('title 3', 'This is title 3 song', 30.30, 'phone', 20, 20, 20, 'thumbnail.png', 3, 3),
-	   ('title 4', 'This is title 4 pet', 40.40, 'chair', 5, 5, 5, 'thumbnail.png', 4, NULL),
-       ('title 1 second', 'This is title 1 book', 10.10, 'electronic', 5, 5, 5, 'thumbnail.png', 1, 1);
+-- INSERT INTO product (title, description, price, category, length, width, height, image, template_id, wid)
+-- VALUES ('title 1', 'This is title 1 book', 10.10, 'electronic', 5, 5, 5, 'thumbnail.png', 1, 1),
+-- 	   ('title 2', 'This is title 2 book', 20.20, 'furniture', 10, 10, 10, 'thumbnail.png', 2, 2),
+--        ('title 3', 'This is title 3 song', 30.30, 'phone', 20, 20, 20, 'thumbnail.png', 3, 3),
+-- 	   ('title 4', 'This is title 4 pet', 40.40, 'chair', 5, 5, 5, 'thumbnail.png', 4, NULL),
+--        ('title 1 second', 'This is title 1 book', 10.10, 'electronic', 5, 5, 5, 'thumbnail.png', 1, 1);
        
 
 

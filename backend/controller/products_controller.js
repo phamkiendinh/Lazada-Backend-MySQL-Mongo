@@ -81,7 +81,7 @@ async function update_product(req, res) {
 }
 
 async function delete_product(req, res) {
-    const productId = req.params.id;
+    const productId = parseInt(req.params.id);
 
     var collection = client.db('lazada').collection('product_template'); 
     const result = await collection.deleteOne({pid : productId});
@@ -113,16 +113,14 @@ async function delete_product(req, res) {
                 console.error('Error deleting product:', err);
                 res.status(500).json({ error: 'Error deleting product' });
             } else {
-                console.log(imageFilename)
                 if (imageFilename != "thumbnail.png") {
-                    const imagePath = path.join('../frontend/seller/Assets', imageFilename);
-                    fs.unlink(imagePath, (err) => {
+                    fs.unlink(`../frontend/seller/Assets/${imageFilename}`, (err) => {
                         if (err) {
                             console.error('Error deleting image file:', err);
                         }
                     });
                 }
-                res.status(200).json({ message: 'Product and image deleted successfully' });
+                res.status(200).json({ message: 'Product deleted successfully' });
             }
         });
     });
