@@ -90,13 +90,13 @@ function Products() {
     }
     
     function searchPrice(e) {
-        if (minPrice >= maxPrice) {
+        if (parseFloat(minPrice) >= parseFloat(maxPrice)) {
             window.alert('Min price must be smaller than max price');
             return;
         }
         const newArray = [];
         for (const product of products) {
-            if (minPrice <= product.price && product.price <= maxPrice){
+            if (parseFloat(minPrice) <= parseFloat(product.price) && parseFloat(product.price) <= parseFloat(maxPrice)){
                 newArray.push(product);
             }
         }

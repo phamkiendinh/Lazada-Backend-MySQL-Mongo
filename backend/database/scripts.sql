@@ -1,5 +1,5 @@
 -- DROP DATABASE lazada;
-CREATE DATABASE lazada;
+-- CREATE DATABASE lazada;
 USE lazada;
 
 -- These drops are used for fast reseting tables and datas for testing and experimenting purposes
@@ -467,6 +467,8 @@ FLUSH PRIVILEGES;
 GRANT `admin` TO `lazada_admin`@`localhost`;
 GRANT `seller` TO `lazada_seller`@`localhost`;
 GRANT `customer` TO `lazada_customer`@`localhost`;
+
+-- select * from warehouse;
 
 -- show grants for `lazada_customer`@`localhost`;
 -- select host, user, plugin, authentication_string from mysql.user;
