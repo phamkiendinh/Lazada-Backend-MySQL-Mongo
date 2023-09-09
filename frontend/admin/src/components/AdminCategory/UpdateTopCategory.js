@@ -223,13 +223,8 @@ function UpdateTopCategory() {
                                     </div>
                                 )
                             }
-                            else if (key === 'sub_category') {
-                                return (
-                                    <div className="border border-2 border-primary mt-2 d-flex justify-content-between d-none">
-                                       <h1>{key}</h1>
-                                       <button className="btn btn-primary" onClick={() => renderUpdateForm(key)}>Update</button>
-                                    </div>
-                                )
+                            else if (key === "sub_category") {
+                                
                             }
                             else {
                                 return (
