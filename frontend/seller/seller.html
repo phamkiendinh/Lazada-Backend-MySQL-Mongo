@@ -15,6 +15,7 @@
     <button id="create-button" class="create-button">Create</button>
     <div class="overlay" id="overlay"></div>
 
+    <!-- Create Form Container -->
     <div id="create-form-container" class="form-container">
       <form id="create-form" enctype="multipart/form-data">
         <fieldset>
@@ -45,16 +46,15 @@
             <input id="create-image-input" name="image" type="file" accept="image/*">
           </div>
 
+          <!-- Create Image Display -->
           <div>
             <div id="create-img-display" class="img-display">
               <img id="create-product-img" src="" alt="Product Image">
             </div>
             <h3>Additional Attributes:</h3>
             <div id="create-category-attributes" class="attributes">
-
             </div>
           </div>
-          
         </fieldset>      
       </form>
       
@@ -63,7 +63,9 @@
         <button id="form-create-button" class="create-button">Create</button>
       </div>
     </div>
+    <!-- End of Create Form Container -->
 
+    <!-- Update Form Container -->
     <div id="update-form-container" class="form-container">
       <form id="update-form" enctype="multipart/form-data">
         <fieldset>
@@ -73,9 +75,7 @@
             <input id="update-title-input" name="title" placeholder="Title" type="text" value="0" min="0" required>
   
             <label for="update-category">Category:</label>
-            <select id="update-category" name="category">
-              
-            </select>
+            <select id="update-category" name="category" disabled></select>
 
             <label for="update-description">Description</label>
             <textarea id="update-description-input" name="description" placeholder="Product Description" rows="4" cols="50" required></textarea>
@@ -95,6 +95,7 @@
             <label for="update-image">Image</label>
             <input id="update-image-input" name="image" type="file" accept="image/*">
           </div>
+          <!-- Update Image Display -->
           <div>
             <div id="update-img-display" class="img-display">
               <img id="update-product-img" src="" alt="Product Image">
@@ -113,7 +114,7 @@
         <button id="form-order-button" class="order-button">Order</button>
       </div>
     </div>
-
+    <!-- End of Update Form Container -->
   </main>
   
   <script src="seller.js"></script>
