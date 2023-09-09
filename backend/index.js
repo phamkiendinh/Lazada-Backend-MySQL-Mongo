@@ -1,5 +1,5 @@
 // Dependencies: Nodemon, Cors, Body-parser, Router
-
+// Express App
 const express = require('express');
 const cors = require('cors'); 
 const bodyParser = require('body-parser');
@@ -13,14 +13,16 @@ const orders_router = require('./routes/orders_router');
 const app = express();
 const port = process.env.PORT || 3001;
 
-
+// Allow outside origins
 app.use(cors());
+
+// Read body from the request
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
 
 
-
+// Group related API endpoints
 app.use('/admin', admin_router);
 app.use('/admin/warehouse', warehouse_router);
 

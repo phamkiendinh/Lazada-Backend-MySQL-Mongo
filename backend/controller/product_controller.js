@@ -1,6 +1,7 @@
 const client = require('../database/mongoDB.js');
 const db = require('../database/mySQL.js');
 
+// Get all products inside the mySQL server
 async function getAllProduct(req, res) {
     const json = req.body;
     const query = `SELECT * from product_template`;
@@ -17,6 +18,7 @@ async function getAllProduct(req, res) {
     });
 }
 
+// Get all product based on one category
 async function getAllProductCategory(req,res) {
     const query = `SELECT DISTINCT category from product_template`;
     db.query(query, async (err, response) => {
@@ -32,6 +34,7 @@ async function getAllProductCategory(req,res) {
     });
 }
 
+// Get products inside the server based on template ID
 async function countProducts(req, res) {
     const templateID = req.params.templateID;
     const query = `
@@ -52,6 +55,7 @@ async function countProducts(req, res) {
     });
 }
 
+// Order products based on template ID and quantity
 async function orderProduct(req, res) {
     const product_template_id = req.body.product_template_id;
     const customer_id = req.body.customer_id;
@@ -73,6 +77,7 @@ async function orderProduct(req, res) {
     // res.send({status: 200});
 }
 
+// Complete an order where customer accept or reject orders
 async function finishOrder(req, res) {
     const order_status = req.body.order_status;
     const product_order_id = req.body.product_order_id;
@@ -100,6 +105,7 @@ async function finishOrder(req, res) {
     // res.json({status: 200});
 }
 
+// Clean any orders that have been completed or rejected, not used 
 async function cleanOrder() {
     const query = `CALL clean_up_order()`;
     db.query(query, async (err, response) => {
@@ -112,12 +118,6 @@ async function cleanOrder() {
         }
     });
 }
-
-// order_product(1,1,2)
-// accept_order
-// reject_order
-
-
 
 
 module.exports = {

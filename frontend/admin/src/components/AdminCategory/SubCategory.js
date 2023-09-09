@@ -2,6 +2,7 @@ import { useLoaderData, useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 function SubCategory() {
+    // Data Initiations
     const loadData = useLoaderData();
     const navigate = useNavigate();
     var url = window.location.href;
@@ -18,12 +19,13 @@ function SubCategory() {
         return data;
     }
 
+    // If There are no sub-category, prompt admin to add new ones
     if (loadData === null || loadData.length === 0) {
         return (
             <div>
                 <div className='row'>
                     <div className='col-2 left-panel mt-5'>
-                        <button className="btn btn-primary w-100 m-1" onClick={() => navigate(`/admin/category/${topCategory}`)}>
+                        <button className="btn btn-primary w-100 m-1" onClick={() => navigate(`/admin/category`)}>
                             Go Back
                         </button>
                     </div>
@@ -143,6 +145,7 @@ function SubCategory() {
     );
 }
 
+// Load Data
 export async function loadAllSubCategory({request, params}) {
     var categoryName = params.categoryName;
     var data = await

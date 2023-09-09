@@ -1,4 +1,5 @@
--- CREATE DATABASE lazada;
+-- DROP DATABASE lazada;
+CREATE DATABASE lazada;
 USE lazada;
 
 -- These drops are used for fast reseting tables and datas for testing and experimenting purposes

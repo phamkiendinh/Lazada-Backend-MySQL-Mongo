@@ -2,7 +2,7 @@ import { Form, useLocation, useNavigate, redirect} from "react-router-dom";
 import { useRef, useState } from "react";
 
 function CreateTopCategory () {
-
+    // Data Initiations
     const navigate = useNavigate();
     const [defaultCategory, setDefaultCategory] = useState([]);
     const [category, setCategory] = useState([]);
@@ -66,7 +66,7 @@ function CreateTopCategory () {
         navigate('/admin/category');
     }
     
-    
+    // Add new attribute to current category
     function addField() {
         if (input === '') {
             window.alert('Input must not be blanked');
@@ -108,7 +108,7 @@ function CreateTopCategory () {
                 <div className="container-fluid d-flex justify-content-center">
                     <h1 className="fw-bold">Create Top-Category</h1>
                 </div>
-
+                
                 <Form onSubmit={saveTopCategory}>
                     <fieldset>
                         <label htmlFor="name" className="form-label"><h1>Name</h1></label>

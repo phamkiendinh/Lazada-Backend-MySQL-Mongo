@@ -2,7 +2,7 @@ const db = require('../database/mySQL');
 
 
 
-
+// Get all warehouse in mySQL servers
 async function getAllWareHouse(req, res) {
     var query = `SELECT * FROM warehouse;`;
     db.query(query, async (err, response) => {
@@ -18,6 +18,7 @@ async function getAllWareHouse(req, res) {
     // res.send({status: 200});
 }
 
+// Get one warehouse
 async function getWareHouse(req, res) {
     var warehouseID = req.params.warehouseID;
     var query = `SELECT * FROM warehouse WHERE warehouse.id = ?;`;
@@ -32,9 +33,10 @@ async function getWareHouse(req, res) {
     });
 }
 
+// Add new warehouse
 async function addWareHouse(req, res) {
     const data = req.body;
-    // console.log(data);
+    console.log(data);
     var addAddressQuery = `
         INSERT INTO warehouse_address (province, city, district, street, street_number)
         VALUES(?,?,?,?,?);
@@ -92,6 +94,7 @@ async function addWareHouse(req, res) {
     });
 }
 
+// Count products in a warehouse for warehouse deletion/update
 async function countProducts(req, res) {
     var warehouseID = req.params.warehouseID;
     var query = `
@@ -111,6 +114,7 @@ async function countProducts(req, res) {
     });
 }
 
+// Get warehouse address
 async function getAddressID(req, res) {
     var warehouseID = req.params.warehouseID;
 
@@ -131,6 +135,7 @@ async function getAddressID(req, res) {
     });
 }
 
+// Update warehouse when there are no products inside this warehouse
 function updateWareHouse(req, res) {
     var warehouseID = req.params.warehouseID;
     var warehouse_name = req.body.warehouse_name;
@@ -156,6 +161,7 @@ function updateWareHouse(req, res) {
     });
 } 
 
+// Delete warehouse when there are no products inside this warehouse
 function deleteWareHouse (req, res) {
     var warehouseID = req.params.warehouseID;
 
@@ -175,7 +181,7 @@ function deleteWareHouse (req, res) {
     });
 }
 
-
+// Get all product inside a warehouse
 function getAllProduct(req, res) {
     var warehouseID = req.params.warehouseID;
     var query = `
@@ -195,6 +201,7 @@ function getAllProduct(req, res) {
     });
 }
 
+// Move one product from a warehouse to new warehouse
 function moveProduct(req, res) {
     var json = req.body;
     var productID = json.productID;
@@ -215,6 +222,7 @@ function moveProduct(req, res) {
     });
 }   
 
+// Get products that exceeded warehouse volume and move the products when there are available volume in warehouses. 
 async function getAllWaitingProducts(req, res) {
     var query = `
         SELECT * from product
@@ -233,6 +241,7 @@ async function getAllWaitingProducts(req, res) {
     });
 }
 
+// Delete a waiting product
 async function deleteProduct(req, res) {
     var productID = req.params.productID;
     var query = `

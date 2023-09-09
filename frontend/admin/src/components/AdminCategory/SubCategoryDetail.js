@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 
 
-
+// Simple View Detail Component
 function SubCategoryDetail() {
     const navigate = useNavigate();
     const data = useLocation().state;

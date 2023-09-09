@@ -1,6 +1,7 @@
 import {Link, useLoaderData} from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 function TopCategory() {
+    // Data Initiations
     const navigate = useNavigate();
     const categories = useLoaderData();
 
@@ -18,7 +19,7 @@ function TopCategory() {
     async function deleteTopCategory(category) {
         const response = await countCategoryProduct(category);
         if (response.count === 0) {
-            await fetch(`http://localhost:3001/admin/category/${category}/delete`, {
+            const res = await fetch(`http://localhost:3001/admin/category/${category}/delete`, {
                 method: 'DELETE'
             })
             .then(res => res.json())
@@ -29,6 +30,9 @@ function TopCategory() {
                 console.log(e);
                 return null;
             })
+            if (res.status === 445) {
+                window.alert("Can't delete, please delete all sub-categories first!");
+            }
             navigate(0);
         }
         else {

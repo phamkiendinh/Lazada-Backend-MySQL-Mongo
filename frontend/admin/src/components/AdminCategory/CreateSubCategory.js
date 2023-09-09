@@ -2,6 +2,7 @@ import { Form, useLocation, useNavigate, redirect, useLoaderData, useParams} fro
 import { useRef, useState } from "react";
 
 function CreateSubCategory () {
+    // Data Initiations
     const params = useParams();
     var topCategory = params.categoryName;
     const loadData = useLoaderData();
@@ -18,7 +19,7 @@ function CreateSubCategory () {
     });
     // console.log(entries);
     
-
+    // Variables
     const navigate = useNavigate();
     const [category, setCategory] = useState([]);
     const [nameInput, setNameInput] = useState({categoryName: ""});
@@ -85,6 +86,7 @@ function CreateSubCategory () {
         navigate(`/admin/category/${topCategory}`);
     }
 
+    // save new field to current category
     function addField() {
         if (input === '') {
             window.alert('Input must not be blanked');
@@ -112,6 +114,7 @@ function CreateSubCategory () {
         closeFieldForm();
     }
 
+    // Render
     return (
         <div className="row">
             <div className='col-2 left-panel mt-5'>
@@ -124,6 +127,7 @@ function CreateSubCategory () {
                     <h1 className="fw-bold">Create Sub-Category</h1>
                 </div>
 
+                {/* Main Form */}
                 <Form onSubmit={saveSubCategory}>
                     <fieldset>
                         <label htmlFor="name" className="form-label"><h1>Name</h1></label>
@@ -165,6 +169,7 @@ function CreateSubCategory () {
                     </fieldset>
                 </Form>
 
+                {/* Sub Form */}
                 <div id="addFieldForm" style={{display: fieldFormVisibility}}>
                     <legend className="fw-bold">Add Field</legend>
                     <div className="mb-3">

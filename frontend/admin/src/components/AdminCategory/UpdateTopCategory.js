@@ -76,7 +76,7 @@ function UpdateTopCategory() {
             ...newData
         ];
         // console.log(data);
-        await fetch(`http://localhost:3001/admin/category/${topCategory}/update`, 
+        const response = await fetch(`http://localhost:3001/admin/category/${topCategory}/update`, 
         {
             method: 'POST',
             headers: {
@@ -87,12 +87,19 @@ function UpdateTopCategory() {
         .then(res => res.json())
         .then(data => {
             console.log(data);
+            return data;
         })
         .catch(e => {
             console.log(e);
             return null;
         })
-        navigate('/admin/category');
+        if (response.status === 445) {
+            window.alert("This top category has sub-categories, please delete all sub-categories first");
+            navigate('/admin/category');
+        }
+        else {
+            navigate('/admin/category');
+        }
         return null;
     }
     
@@ -213,6 +220,14 @@ function UpdateTopCategory() {
                                     <div>
                                         <label htmlFor="name" className="form-label"><h1>Name</h1></label>
                                         <input type="text" className="form-control" name="name" defaultValue={value} required onChange={(e) => updateNameInput(e)}/>
+                                    </div>
+                                )
+                            }
+                            else if (key === 'sub_category') {
+                                return (
+                                    <div className="border border-2 border-primary mt-2 d-flex justify-content-between d-none">
+                                       <h1>{key}</h1>
+                                       <button className="btn btn-primary" onClick={() => renderUpdateForm(key)}>Update</button>
                                     </div>
                                 )
                             }

@@ -3,10 +3,10 @@ import { Form, redirect, useNavigate } from "react-router-dom";
 
 function CreateWareHouse() {
     const navigate = useNavigate();
-    const [currentVolume, setCurrentVolume] = useState(0);
+    const [volume, setVolume] = useState(0);
 
     function updateCurrentVolume(e) {
-        setCurrentVolume(e.target.value);
+        setVolume(e.target.value);
     }
     return (
         <div className="row">
@@ -41,12 +41,10 @@ function CreateWareHouse() {
                             <input type="text" id="fieldInput" className="form-control" name="street_number" required/>
 
                             <label htmlFor="volume" className="form-label fw-bold">Volume</label>
-                            <input type="number" id="fieldInput" className="form-control" name="volume" required onChange={(e) => updateCurrentVolume(e)}/>
+                            <input type="number" id="fieldInput" className="form-control" name="volume" required onChange={(e) => updateCurrentVolume(e)} value={volume}/>
 
-                            <input type="number" id="fieldInput" className="form-control d-none" name="current_volume" value={currentVolume}/>
-
-                            <label htmlFor="current_volume" className="form-label fw-bold">Current Volume</label>
-                            <input type="number" id="fieldInput" className="form-control" name="current_volume" disabled value={0}/>
+                            <label htmlFor="current_volume" className="form-label fw-bold">Current Volume : 0</label>
+                            <input type="number" id="fieldInput" className="form-control d-none" name="current_volume" value={0}/>
 
                         </div>
                         <button type="submit" className="btn btn-primary m-2">Create</button>
@@ -61,6 +59,7 @@ function CreateWareHouse() {
 export async function saveWareHouse({request, params}) {
     const formData = await request.formData();
     const data = Object.fromEntries(formData);
+    console.log(data);
     await fetch(`http://localhost:3001/admin/warehouse/create`,
     {
         method: 'POST',

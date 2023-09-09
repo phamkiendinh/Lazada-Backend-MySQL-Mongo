@@ -1,5 +1,6 @@
 const mysql = require("mysql2");
 
+// mYSQL connection, replace this to your local server
 const con = mysql.createPool({
   // host = RDS endpoint
   host: process.env.MYSQL_HOST || 'localhost',
