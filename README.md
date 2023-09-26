@@ -1,4 +1,5 @@
 ﻿# Mysql-Mongo Group 14 README.file
+# This project fully focused on database management for Mongo and MySQL than developing the frontend.
 # This project uses reactjs and static files in frontend, MySQL database in the backend, and establish connections with NodeJS & Express
 **Instruction On Using The App**
 
